@@ -6,6 +6,9 @@ import sys
 server = "localhost"
 port = 14201
 
+#Other info
+playersId = 0
+
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
@@ -43,7 +46,8 @@ def threaded_client(conn, playerId, gameId):
 
 while True:
     conn, addr = s.accept()
-    print(f"Connected to: {addr}. Assigned playerId: {1}.")
+    playersId += 1
+    print(f"Connected to: {addr}. Assigned playerId: {players}.")
 
     #Start a new thread that will be used to communicate with the player
-    start_new_thread(threaded_client, (conn, 1, 0))
+    start_new_thread(threaded_client, (conn, playersId, 0))
