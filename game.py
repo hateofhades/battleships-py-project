@@ -14,11 +14,19 @@ light_color_for_play_button = (135,190,144)
 
 WIDTH = 1200
 HEIGHT = 900
+
 #create font for the play button
 smallfont = pygame.font.SysFont('Corbel',200)
 text = smallfont.render('PLAY' , True , WHITE)
 
-#!!!To work, the path to the image must be changed
+#create font for ID boxes and add colors for them
+base_font = pygame.font.Font(None, 32)
+rectangle_box_active_color = (114,121,121)
+rectangle_box_passive_color = WHITE
+smallfont_ID = pygame.font.SysFont('Corbel',32)
+id_text = smallfont_ID.render('Player ID: ' , True , WHITE)
+
+#!!!To work, the path of the image must be changed
 back_ground = pygame.image.load('/Users/iulia-andreea_grigore/Desktop/py/py_proj/homepage_background.jpg')
 bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
 
@@ -30,34 +38,73 @@ class Game:
 		pygame.display.set_caption("Battleships")
 
 	def draw(self):
-		
+		self.user_id =''
 		running = True
+
+		#using cliked variable to see if the play button was clicked
+		clicked = False
+
+		#rectangle box to enter the player ID
+		rectangle_box = pygame.Rect(620,520,160,35)
+		color = rectangle_box_passive_color
+		active = False
+
 		while running:
 			for event in pygame.event.get():
 			# check if the player has closed the game   
 				if event.type == pygame.QUIT:
 					running = False
 					pygame.quit()
-			#check if the player has started the game and change the background if so
-				if event.type == pygame.MOUSEBUTTONDOWN:
+				
+				#ID box responsive to the mouse of the player
+				if clicked == False:
+					if event.type == pygame.MOUSEBUTTONDOWN:
+						if rectangle_box.collidepoint(event.pos):
+							active = True
+						else:
+							active = False
+					if event.type == pygame.KEYDOWN:
+						if active == True:
+							if event.key == pygame.K_BACKSPACE:
+								self.user_id = self.user_id[:-1]
+							else:
+								self.user_id += event.unicode
+
+					#background of the home page
+					self.window.blit(bg, (0,0))
+
+					#active functionality of the mouse box ID
+					if active:
+						color = rectangle_box_active_color
+					else:
+						color = rectangle_box_passive_color
+
+					#check the position of the player's mouse 
+					# and change the color of the play button, depending on it
+					mouse = pygame.mouse.get_pos()
 					if 350 <= mouse[0] <= 850 and 350 <= mouse[1] <= 500:
-						#I'm working on it
-						#This is just a test
-						pygame.quit()
+						pygame.draw.rect(self.window,light_color_for_play_button,[350, 350, 500, 150])
 
-			#background of the home page
-			self.window.blit(bg, (0,0))
+						#check if the player has started the game and change the background if so
+						if event.type == pygame.MOUSEBUTTONDOWN:
+							self.window.fill(BLACK)
+							clicked = True
+							pygame.display.update()
+					else:
+						pygame.draw.rect(self.window, dark_color_for_play_button,[350, 350, 500, 150])
 
-			#check the position of the player's mouse 
-			# and change the color of the play button, depending on it
-			mouse = pygame.mouse.get_pos()
-			if 350 <= mouse[0] <= 850 and 350 <= mouse[1] <= 500:
-				pygame.draw.rect(self.window,light_color_for_play_button,[350, 350, 500, 150])
-			else:
-				pygame.draw.rect(self.window, dark_color_for_play_button,[350, 350, 500, 150])
+					#draw the ID boxes
+					if clicked == False:
+						pygame.draw.rect(self.window,rectangle_box_active_color, [430,520,160,35], 2)
+						pygame.draw.rect(self.window, rectangle_box_active_color, rectangle_box)
+						text_surface = base_font.render(self.user_id, True, WHITE)
+						self.window.blit(text_surface, (rectangle_box.x + 5, rectangle_box.y + 5))
+						rectangle_box.w = max(150, text_surface.get_width() + 10)
+				
 
-			#the position of the Play botton text
-			self.window.blit(text ,(418,365))
+				if clicked == False:
+					#draw the texts from the buttons
+					self.window.blit(text ,(418,365))
+					self.window.blit(id_text, (462,528))
 
-			pygame.display.update()
-		
+				pygame.display.update()
