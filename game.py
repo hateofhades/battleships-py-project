@@ -41,6 +41,8 @@ class Game:
 			#check if the player has started the game and change the background if so
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					if 350 <= mouse[0] <= 850 and 350 <= mouse[1] <= 500:
+						#I'm working on it
+						#This is just a test
 						pygame.quit()
 
 			#background of the home page
