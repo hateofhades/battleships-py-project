@@ -12,6 +12,10 @@ class gameServer:
     def isPlaying(self):
         return self.started
     
+    #Returns the status of the game (whose turn, table state, guesses made)
+    def getGameState(self):
+        return (self.isPlaying, self.whoPlays, self.player1Table, self.player2Table, self.player1Guessed, self.player2Guessed)
+
     #Return who plays
     def whichPlayerTurn(self):
         return self.whoPlays

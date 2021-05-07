@@ -1,4 +1,5 @@
 import pygame
+from networkClass import Network
 import sys
 
 pygame.init()
@@ -32,10 +33,11 @@ bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
 
 #class of in-game items
 class Game:
-	
 	def __init__(self):
 		self.window = pygame.display.set_mode((WIDTH, HEIGHT))
 		pygame.display.set_caption("Battleships")
+		self.n = Network()
+		print(self.n.send("Hello bois"))
 
 	def draw(self):
 		self.user_id =''

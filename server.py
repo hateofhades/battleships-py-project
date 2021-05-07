@@ -2,6 +2,7 @@ import socket
 from gameLogic import gameServer
 from _thread import *
 import sys
+import pickle
 
 #Creating the array of games
 games = {}
@@ -31,17 +32,17 @@ def threaded_client(conn, playerId, gameId):
 
     while True:
         try:
-            data = conn.recv(2048).decode("utf-8")
+            data = conn.recv(4096).decode()
 
             if not data:
                 print("Disconnected")
                 break
             else:
-                print("Received: ", data)
-                if data == "1":
-                    ok += 1
+                print(data)
 
-            conn.sendall(str.encode(str(ok)))
+
+
+            conn.sendall(pickle.dumps(games))
         except:
             break
 
