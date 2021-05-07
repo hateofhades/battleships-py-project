@@ -38,11 +38,23 @@ def threaded_client(conn, playerId, gameId):
                 print("Disconnected")
                 break
             else:
-                print(data)
-
-
-
-            conn.sendall(pickle.dumps(games))
+                data = data.split(" ")
+                if data[0] == "hit":
+                    conn.sendall(pickle.dumps(games[gameId]))
+                    if playerId % 2 == 1:
+                        print(games[gameId].guessPlayer1(data[1], data[2]))
+                    else:
+                        receiveData = games[gameId].guessPlayer2(data[1], data[2])
+                        
+                if data[0] == "get":
+                    conn.sendall(pickle.dumps(receiveData))
+                if data[0] == "place":
+                    conn.sendall(pickle.dumps(games[gameId]))
+                    boatType = data[1]
+                    boatStartX = data[2]
+                    boatStartY = data[3]
+                    boatOrientation = data[4]
+                    receiveData = games[gameId].placeBoat(boatType, boatStartX, boatStartY, boatOrientation, playersId % 2)
         except:
             break
 

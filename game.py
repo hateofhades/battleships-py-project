@@ -2,8 +2,10 @@ import pygame
 from networkClass import Network
 import sys
 import os
-THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
-my_file = os.path.join(THIS_FOLDER, 'homepage_background.jpg')
+
+currentFolder = os.path.dirname(os.path.abspath(__file__))
+backgroundImage = os.path.join(currentFolder, 'homepage_background.jpg')
+
 pygame.init()
 frame_rate = pygame.time.Clock()
 
@@ -30,7 +32,7 @@ smallfont_ID = pygame.font.SysFont('Corbel',32)
 id_text = smallfont_ID.render('Player ID: ' , True , WHITE)
 # 
 #Create Background
-back_ground = pygame.image.load(my_file)
+back_ground = pygame.image.load(backgroundImage)
 bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
 
 #class of in-game items
@@ -39,7 +41,7 @@ class Game:
 		self.window = pygame.display.set_mode((WIDTH, HEIGHT))
 		pygame.display.set_caption("Battleships")
 		self.n = Network()
-		print(self.n.send("Hello bois"))
+		print(self.n.send("meg"))
 
 	def draw(self):
 		self.user_id = self.n.id
