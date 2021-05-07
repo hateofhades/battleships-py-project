@@ -40,7 +40,7 @@ class Game:
 		print(self.n.send("Hello bois"))
 
 	def draw(self):
-		self.user_id =''
+		self.user_id = self.n.id
 		running = True
 
 		#using cliked variable to see if the play button was clicked
