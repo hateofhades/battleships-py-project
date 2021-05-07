@@ -1,6 +1,10 @@
 import socket
+from gameLogic import gameServer
 from _thread import *
 import sys
+
+#Creating the array of games
+games = {}
 
 #Info about the server
 server = "localhost"
@@ -42,12 +46,25 @@ def threaded_client(conn, playerId, gameId):
             break
 
     print("Lost connection")
+    try:
+        del games[gameId]
+        print(f"Closed game {gameId}")
+    except:
+        pass
     conn.close()
 
 while True:
     conn, addr = s.accept()
     playersId += 1
-    print(f"Connected to: {addr}. Assigned playerId: {players}.")
+    gameId = (playersId - 1)//2
+
+    if playersId % 2 == 1:
+        games[gameId] = gameServer(playersId, None, gameId)
+        print(f"Creating a new game. (Game id: {gameId} | Player 1: {playersId})")
+    else:
+        games[gameId].addPlayer2(playersId)
+        print(f"Adding player {playersId} to game {gameId}")
+        games[gameId].start()
 
     #Start a new thread that will be used to communicate with the player
     start_new_thread(threaded_client, (conn, playersId, 0))

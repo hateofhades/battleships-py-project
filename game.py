@@ -26,8 +26,8 @@ rectangle_box_passive_color = WHITE
 smallfont_ID = pygame.font.SysFont('Corbel',32)
 id_text = smallfont_ID.render('Player ID: ' , True , WHITE)
 
-#!!!To work, the path of the image must be changed
-back_ground = pygame.image.load('/Users/iulia-andreea_grigore/Desktop/py/py_proj/homepage_background.jpg')
+#Create Background
+back_ground = pygame.image.load('./homepage_background.jpg')
 bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
 
 #class of in-game items
