@@ -30,6 +30,8 @@ def threaded_client(conn, playerId, gameId):
     reply = ""
     ok = 0
 
+    currentGame = games[gameId]
+
     while True:
         try:
             data = conn.recv(4096).decode()
@@ -40,21 +42,24 @@ def threaded_client(conn, playerId, gameId):
             else:
                 data = data.split(" ")
                 if data[0] == "hit":
-                    conn.sendall(pickle.dumps(games[gameId]))
+                    conn.sendall(pickle.dumps(currentGame))
                     if playerId % 2 == 1:
-                        print(games[gameId].guessPlayer1(data[1], data[2]))
+                        currentGame.guessPlayer1(data[1], data[2])
                     else:
-                        receiveData = games[gameId].guessPlayer2(data[1], data[2])
+                        currentGame.guessPlayer2(data[1], data[2])
                         
-                if data[0] == "get":
-                    conn.sendall(pickle.dumps(receiveData))
-                if data[0] == "place":
-                    conn.sendall(pickle.dumps(games[gameId]))
+                elif data[0] == "get":
+                    conn.sendall(pickle.dumps(currentGame))
+                elif data[0] == "start":
+                    conn.sendall(pickle.dumps(currentGame))
+                    currentGame.start()
+                elif data[0] == "place":
+                    conn.sendall(pickle.dumps(currentGame))
                     boatType = data[1]
                     boatStartX = data[2]
                     boatStartY = data[3]
                     boatOrientation = data[4]
-                    receiveData = games[gameId].placeBoat(boatType, boatStartX, boatStartY, boatOrientation, playersId % 2)
+                    currentGame.placeBoat(boatType, boatStartX, boatStartY, boatOrientation, playersId % 2)
         except:
             break
 
@@ -80,4 +85,4 @@ while True:
         games[gameId].start()
 
     #Start a new thread that will be used to communicate with the player
-    start_new_thread(threaded_client, (conn, playersId, 0))
+    start_new_thread(threaded_client, (conn, playersId, gameId))

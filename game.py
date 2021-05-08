@@ -1,7 +1,12 @@
 import pygame
 from networkClass import Network
+from gameLogic import gameServer
 import sys
 import os
+
+#Place boat command
+#self.n.send("place marime-barca x y orientare")
+#game = self.n.send("get")
 
 currentFolder = os.path.dirname(os.path.abspath(__file__))
 backgroundImage = os.path.join(currentFolder, 'homepage_background.jpg')
@@ -14,6 +19,7 @@ WHITE = (255,255,255)
 BLACK = (0,0,0)
 BLUE = (0,0,255)
 RED = (255, 0 ,0)
+BOATCOLOR = (255, 255, 255)
 
 
 dark_color_for_play_button = (1,50,32)
@@ -43,7 +49,7 @@ class Game:
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Battleships")
         self.n = Network()
-        print(self.n.send("Hello bois"))
+        self.started = 0
 
     def draw(self):
         self.user_id = self.n.id
@@ -58,6 +64,81 @@ class Game:
         active = False
 
         while running:
+            game = gameServer(None, None, None)
+            game = self.n.send("get")
+            self.started = game.isPlaying()
+
+            
+            
+            if self.started == 1:
+                self.window.fill(BLACK)
+                clicked = True
+
+                #draw the tables
+                height = 47
+                margin = 5
+
+                for row in range(10):
+                        for column in range(10):
+                            pygame.draw.rect(self.window, BLUE, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])
+                            pygame.draw.rect(self.window, BLUE, [660 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
+
+                if int(self.n.id) % 2 == 1: 
+                    for row in range(10):
+                        for column in range(10):
+                            if game.player1Table[row][column] == 1:
+                                pygame.draw.rect(self.window, BOATCOLOR, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])  
+                            if game.player2Guessed[row][column] == 1:
+                                pygame.draw.rect(self.window, BLACK, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])
+                            if game.player2Guessed[row][column] == 2:
+                                pygame.draw.rect(self.window, RED, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])
+                        
+                    for row in range(10):
+                        for column in range(10):
+                            color = BLUE
+                            if game.player1Guessed[row][column] == 1:
+                                color = BLACK
+                            if game.player1Guessed[row][column] == 2:
+                                color = RED
+                            pygame.draw.rect(self.window, color, [660 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
+
+                else:
+                    for row in range(10):
+                        for column in range(10):
+                            color = BLUE
+                            if game.player2Guessed[row][column] == 1:
+                                color = BLACK
+                            if game.player2Guessed[row][column] == 2:
+                                color = RED
+                            pygame.draw.rect(self.window, color, [660 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
+                        
+                    for row in range(10):
+                        for column in range(10):
+                            if game.player2Table[row][column] == 1:
+                                pygame.draw.rect(self.window, BOATCOLOR, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])  
+                            if game.player1Guessed[row][column] == 1:
+                                pygame.draw.rect(self.window, BLACK, [(margin + height) * column + margin, (margin + height) * row + margin, height, height]) 
+                            if game.player1Guessed[row][column] == 2:
+                                pygame.draw.rect(self.window, RED, [(margin + height) * column + margin, (margin + height) * row + margin, height, height]) 
+
+                pygame.draw.line(self.window, (255, 0 ,255), (600,0), (600,600), 3)
+                
+
+                player_text1 = smallfont_ID.render("You" , True , WHITE)
+                self.window.blit(player_text1,(200,550))
+                player_text2 = smallfont_ID.render("Enemy" , True , WHITE)
+                self.window.blit(player_text2,(800,550))
+                
+                pygame.display.update()
+            
+            
+            
+            
+            
+            
+            
+            
+            
             for event in pygame.event.get():
             # check if the player has closed the game   
                 if event.type == pygame.QUIT:
@@ -95,38 +176,10 @@ class Game:
 
                         #check if the player has started the game and change the background if so
                         if event.type == pygame.MOUSEBUTTONDOWN:
-                            self.window.fill(BLACK)
-                            clicked = True
-
-                            #draw the tables
-                            height = 47
-                            margin = 5
-                            for row in range(10):
-                                for column in range(10):
-                                    color = BLUE
-                                    """ if grid1[row][column] == 1:
-                                        color = RED
-                                    if grid1[row][column] == 2:
-                                        color = BLACK """
-                                    pygame.draw.rect(self.window, (0, 192, 192), [(margin + height) * column + margin, (margin + height) * row + margin, height, height])
-                            
-                            for row in range(10):
-                                for column in range(10):
-                                    color = BLUE
-                                    """ if grid2[row][column] == 1:
-                                        color = RED
-                                    if grid2[row][column] == 2:
-                                        color = BLACK """
-                                    pygame.draw.rect(self.window, BLUE, [660 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
-
-                            pygame.draw.line(self.window, (255, 0 ,255), (600,0), (600,600), 3)
-                            
-                            player_text1 = smallfont_ID.render('Player 1: ' , True , WHITE)
-                            self.window.blit(player_text1,(200,550))
-                            player_text2 = smallfont_ID.render('Player 2: ' , True , WHITE)
-                            self.window.blit(player_text2,(800,550))
-                            
-                            pygame.display.update()
+                            #Check if game can be started!!! (Send a request to the server to start the game and then send a request
+                            # to get newest gamestate, so we can check if the game has started)
+                            self.n.send("start")
+                            game = self.n.send("get")
                     else:
                         pygame.draw.rect(self.window, dark_color_for_play_button,[350, 350, 500, 150])
 
