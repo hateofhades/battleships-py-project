@@ -47,6 +47,8 @@ class gameServer:
                 self.player1Boats += 1
                 if self.player1Boats == 10 and self.player2Boats == 10:
                     self.started = 2
+                    self.player1Boats = 31
+                    self.player2Boats = 31
                 for y in range(boatEndY, boatStartY + 1):
                     self.player1Table[y][boatStartX] = 1
                 return 1
@@ -54,6 +56,8 @@ class gameServer:
                 self.player2Boats += 1
                 if self.player1Boats == 10 and self.player2Boats == 10:
                     self.started = 2
+                    self.player1Boats = 31
+                    self.player2Boats = 31
                 for y in range(boatEndY, boatStartY + 1):
                     self.player2Table[y][boatStartX] = 1
                 return 1
@@ -73,6 +77,8 @@ class gameServer:
                 self.player1Boats += 1
                 if self.player1Boats == 10 and self.player2Boats == 10:
                     self.started = 2
+                    self.player1Boats = 31
+                    self.player2Boats = 31
                 for y in range(boatStartY, boatEndY + 1):
                     self.player1Table[y][boatStartX] = 1
                 return 1
@@ -80,6 +86,8 @@ class gameServer:
                 self.player2Boats += 1
                 if self.player1Boats == 10 and self.player2Boats == 10:
                     self.started = 2
+                    self.player1Boats = 31
+                    self.player2Boats = 31
                 for y in range(boatStartY, boatEndY + 1):
                     self.player2Table[y][boatStartX] = 1
                 return 1
@@ -100,6 +108,8 @@ class gameServer:
                 self.player1Boats += 1
                 if self.player1Boats == 10 and self.player2Boats == 10:
                     self.started = 2
+                    self.player1Boats = 31
+                    self.player2Boats = 31
                 for x in range(boatStartX, boatEndX + 1):
                     self.player1Table[boatStartY][x] = 1
                 return 1
@@ -107,6 +117,8 @@ class gameServer:
                 self.player2Boats += 1
                 if self.player1Boats == 10 and self.player2Boats == 10:
                     self.started = 2
+                    self.player1Boats = 31
+                    self.player2Boats = 31
                 for x in range(boatStartX, boatEndX + 1):
                     self.player2Table[boatStartY][x] = 1
                 return 1
@@ -127,6 +139,8 @@ class gameServer:
                 self.player1Boats += 1
                 if self.player1Boats == 10 and self.player2Boats == 10:
                     self.started = 2
+                    self.player1Boats = 31
+                    self.player2Boats = 31
                 for x in range(boatEndX, boatStartX + 1):
                     self.player1Table[boatStartY][x] = 1
                 return 1
@@ -134,6 +148,8 @@ class gameServer:
                 self.player2Boats += 1
                 if self.player1Boats == 10 and self.player2Boats == 10:
                     self.started = 2
+                    self.player1Boats = 31
+                    self.player2Boats = 31
                 for x in range(boatEndX, boatStartX + 1):
                     self.player2Table[boatStartY][x] = 1
                 return 1
@@ -169,7 +185,7 @@ class gameServer:
         self.started = 1
     
     def guessPlayer1(self, x, y):
-        if self.isPlaying != 2:
+        if self.isPlaying() != 2:
             return -1
         #If it's not player 1 turn return with error code -1
         if self.whoPlays == 2: 
@@ -186,8 +202,8 @@ class gameServer:
             self.player2Boats -= 1
 
             if self.player2Boats == 0:
-                self.isPlaying = 3
-                self.won = "1"
+                self.started = 3
+                self.won = 1
         else:
             self.player1Guessed[x][y] = 1
             self.whoPlays = 2
@@ -195,7 +211,7 @@ class gameServer:
         return self.player1Guessed[x][y]
     
     def guessPlayer2(self, x, y):
-        if self.isPlaying != 2:
+        if self.isPlaying() != 2:
             return -1
         #If it's not player 2 turn return with error code -1
         if self.whoPlays == 1: 
@@ -212,10 +228,26 @@ class gameServer:
             self.player1Boats -= 1
 
             if self.player1Boats == 0:
-                self.isPlaying = 3
-                self.won = "2"
+                self.started = 3
+                self.won = 2
         else:
             self.player2Guessed[x][y] = 1
             self.whoPlays = 1
 
         return self.player2Guessed[x][y]
+    
+    def resetGame(self):
+        self.started = 0
+        self.whoPlays = 1
+        self.won = 0
+
+        self.player1Table = np.zeros((10, 10))
+        self.player2Table = np.zeros((10, 10))
+        self.player1Guessed = np.zeros((10, 10))
+        self.player2Guessed = np.zeros((10, 10))       
+
+        self.player1Boats = 0
+        self.player2Boats = 0
+
+        self.player1EndedPlacing = 0
+        self.player2EndedPlacing = 0

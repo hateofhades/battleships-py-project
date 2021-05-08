@@ -43,8 +43,9 @@ def threaded_client(conn, playerId, gameId):
                 data = data.split(" ")
                 if data[0] == "hit":
                     conn.sendall(pickle.dumps(currentGame))
+                    print(data[1],data[2])
                     if playerId % 2 == 1:
-                        currentGame.guessPlayer1(int(data[1]), int(data[2]))
+                        print(currentGame.guessPlayer1(int(data[1]), int(data[2])))
                     else:
                         currentGame.guessPlayer2(int(data[1]), int(data[2]))
                         
@@ -65,6 +66,10 @@ def threaded_client(conn, playerId, gameId):
                         player1Or2 = 2
 
                     currentGame.placeBoat(boatType, boatStartX, boatStartY, boatOrientation, player1Or2)
+                elif data[0] == "reset":
+                    conn.sendall(pickle.dumps(currentGame))
+                    currentGame.resetGame()
+
         except:
             break
 

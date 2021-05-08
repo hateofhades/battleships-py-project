@@ -49,6 +49,7 @@ class Game:
         self.started = 0
         self.boatType = 0
         self.totalPutBoat = 0
+        self.orientation_number = 0
 
     def draw(self):
         self.user_id = self.n.id
@@ -68,7 +69,6 @@ class Game:
             self.started = game.isPlaying()
           
             if self.started == 1 or self.started == 2:
-                print("Playing")
                 self.window.fill(BLACK)
                 clicked = True
 
@@ -139,7 +139,7 @@ class Game:
                     cardinals = ['N', 'S', 'E', 'W']
                     v = [2, 3, 4, 6]
                     
-                    orient = cardinals[3]
+                    orient = cardinals[self.orientation_number]
 
                     if self.boatType < 4:
                         dimension = v[self.boatType]
@@ -154,10 +154,9 @@ class Game:
                         for event in pygame.event.get():
                             if event.type == pygame.MOUSEBUTTONDOWN:
                                 mouse_pos = pygame.mouse.get_pos()
-                                print(mouse_pos)
+                                
                                 a = mouse_pos[0] // (height + margin)
                                 b = mouse_pos[1] // (height + margin)
-                                print(a, b)
 
                                 if game.placeBoat(dimension, a, b, orient, player1Or2) == 1:
                                     self.totalPutBoat += 1
@@ -169,6 +168,11 @@ class Game:
                                     game = self.n.send("get")
                                     #draw a black  rectangle on the previous text to make the next one visible :)
                                     pygame.draw.rect(self.window, BLACK, [110, 540, 700, 600])
+                            if event.type == pygame.KEYDOWN:
+                                if event.key == 114:
+                                    self.orientation_number +=1
+                                    if self. orientation_number == 4:
+                                        self.orientation_number = 0 
                     else:
                         if game.isPlaying() == 2:
                             pygame.draw.rect(self.window, BLACK, [110, 540, 700, 600])
@@ -178,18 +182,33 @@ class Game:
                     
                     pygame.display.update()  
 
-                #Guess (self.n.send("hit x y"))
-                #self.n.send("get")
+                #Guess 
                 if self.started == 2:
                     if game.whoPlays == player1Or2:
-                        pass
+                        placing = smallfont_ID.render("Time to guess!" , True , WHITE)
+                        self.window.blit(placing,(120,570))
+                        for event in pygame.event.get():
+                            if event.type == pygame.MOUSEBUTTONDOWN:
+                                mouse_pos = pygame.mouse.get_pos()
+                                print(mouse_pos)
+                                
+                                a = (mouse_pos[0] - 660) // (height + margin)
+                                b = mouse_pos[1] // (height + margin)
+                                print(a,b)
+                                self.n.send(f"hit {b} {a}")
+                                game = self.n.send("get")
+                        
+                    else:
+                        placing = smallfont_ID.render("Waiting for opponent!" , True , WHITE)
+                        self.window.blit(placing,(120,570))
                         #Send guess to server
                 pygame.display.update()            
 
             #Game is finished
             if self.started == 3:
-                #self.n.send("reset")
-                pass
+                self.n.send("reset")
+                game = self.n.send("get")
+            
 
             
             
