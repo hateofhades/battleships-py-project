@@ -1,6 +1,10 @@
 import pygame
 from networkClass import Network
 import sys
+import os
+
+currentFolder = os.path.dirname(os.path.abspath(__file__))
+backgroundImage = os.path.join(currentFolder, 'homepage_background.jpg')
 
 pygame.init()
 frame_rate = pygame.time.Clock()
@@ -28,9 +32,9 @@ rectangle_box_active_color = (114,121,121)
 rectangle_box_passive_color = WHITE
 smallfont_ID = pygame.font.SysFont('Corbel',32)
 id_text = smallfont_ID.render('Player ID: ' , True , WHITE)
-
+# 
 #Create Background
-back_ground = pygame.image.load('./homepage_background.jpg')
+back_ground = pygame.image.load(backgroundImage)
 bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
 
 #class of in-game items
