@@ -47,6 +47,8 @@ class Game:
         pygame.display.set_caption("Battleships")
         self.n = Network()
         self.started = 0
+        self.boatType = 0
+        self.totalPutBoat = 0
 
     def draw(self):
         self.user_id = self.n.id
@@ -65,7 +67,7 @@ class Game:
             game = self.n.send("get")
             self.started = game.isPlaying()
           
-            if self.started == 1:
+            if self.started == 1 or self.started == 2:
                 self.window.fill(BLACK)
                 clicked = True
 
@@ -126,39 +128,53 @@ class Game:
                 #pygame.display.update()
 
                 #init the boats
-                import random
+                player1Or2 = int(self.n.id) % 2
+                if player1Or2 == 0:
+                    player1Or2 = 2
+                
+                if !((player1Or2 == 1 and game.player1EndedPlacing == 1) or (player1Or2 == 2 and game.player2EndedPlacing == 1)):
+                    import random
 
-                cardinals = ['N', 'S', 'E', 'W']
-                v = [2, 3, 4, 6]
+                    cardinals = ['N', 'S', 'E', 'W']
+                    v = [2, 3, 4, 6]
+                    
+                    orient = cardinals[0]
 
-                for i in range(4):
-                    for j in range(i+1):
-                        #generate random orientations for the boats
-                        p1 = random.choice(cardinals)
-                        p2 = random.choice(cardinals)
-                        while p2 == p1:
-                            p2 = random.choice(cardinals)
-                        dimension = v[3 - i]
-                        txt = "Place a {} blocks boat with orientation {}-{}".format(dimension, p1, p2)
-                        placing = smallfont_ID.render(txt , True , WHITE)
-                        self.window.blit(placing,(120,570))
-                        
-                        for event in pygame.event.get():
-                            if event.type == pygame.MOUSEBUTTONDOWN:
-                                mouse_pos = pygame.mouse.get_pos()
-                                a = mouse_pos[0] // (height + margin)
-                                b = mouse_pos[1] // (height + margin)
-                                                        
-                                print(a,b)
-                                
+                    dimension = v[self.boatType]
+
+                    txt = "Place a {} blocks boat with orientation {}".format(dimension, orient)
+                    placing = smallfont_ID.render(txt , True , WHITE)
+                    self.window.blit(placing,(120,570))
+                    
+                    for event in pygame.event.get():
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            mouse_pos = pygame.mouse.get_pos()
+                            print(mouse_pos)
+                            a = mouse_pos[0] // (height + margin)
+                            b = mouse_pos[1] // (height + margin)
+                            print(a, b)
+
+                            if game.placeBoat(dimension, a, b, orient, player1Or2) == 1:
+                                self.totalPutBoat += 1
+                                if self.totalPutBoat == 4 - self.boatType:
+                                    self.totalPutBoat = 0
+                                    self.boatType += 1
                                 #send the info to the server
-                                self.n.send(f"place {dimension} {a} {b} {p2}")
+                                self.n.send(f"place {dimension} {b} {a} {orient}")
                                 game = self.n.send("get")
                                 #draw a black  rectangle on the previous text to make the next one visible :)
                                 pygame.draw.rect(self.window, BLACK, [110, 560, 700, 600])
+                #Guess (self.n.send("hit x y"))
+                #self.n.send("get")
+                if self.started == 2:
+                    if game.whoPlays == player1Or2:
+                        #Send guess to server
+            
 
                 pygame.display.update()            
 
+            #Game is finished
+            if self.started == 3:
 
             
             
@@ -172,55 +188,56 @@ class Game:
                     pygame.quit()
                 
                 #ID box responsive to the mouse of the player
-                if clicked == False:
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        if rectangle_box.collidepoint(event.pos):
-                            active = True
-                        else:
-                            active = False
-                    if event.type == pygame.KEYDOWN:
-                        if active == True:
-                            if event.key == pygame.K_BACKSPACE:
-                                self.user_id = self.user_id[:-1]
-                            else:
-                                self.user_id += event.unicode
-
-                    #background of the home page
-                    self.window.blit(bg, (0,0))
-
-                    #active functionality of the mouse box ID
-                    if active:
-                        color = rectangle_box_active_color
-                    else:
-                        color = rectangle_box_passive_color
-
-                    #check the position of the player's mouse 
-                    # and change the color of the play button, depending on it
-                    mouse = pygame.mouse.get_pos()
-                    if 350 <= mouse[0] <= 850 and 350 <= mouse[1] <= 500:
-                        pygame.draw.rect(self.window,light_color_for_play_button,[350, 350, 500, 150])
-
-                        #check if the player has started the game and change the background if so
-                        if event.type == pygame.MOUSEBUTTONDOWN:
-                            #Check if game can be started!!! (Send a request to the server to start the game and then send a request
-                            # to get newest gamestate, so we can check if the game has started)
-                            self.n.send("start")
-                            game = self.n.send("get")
-                    else:
-                        pygame.draw.rect(self.window, dark_color_for_play_button,[350, 350, 500, 150])
-
-                    #draw the ID boxes
+                if self.started == 0:
                     if clicked == False:
-                        pygame.draw.rect(self.window,rectangle_box_active_color, [430, 520, 160, 35], 2)
-                        pygame.draw.rect(self.window, rectangle_box_active_color, rectangle_box)
-                        text_surface = base_font.render(self.user_id, True, WHITE)
-                        self.window.blit(text_surface, (rectangle_box.x + 5, rectangle_box.y + 5))
-                        rectangle_box.w = max(150, text_surface.get_width() + 10)
-                
-                
-                if clicked == False:
-                    #draw the texts from the buttons
-                    self.window.blit(text ,(418,365))
-                    self.window.blit(id_text, (462,528))
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if rectangle_box.collidepoint(event.pos):
+                                active = True
+                            else:
+                                active = False
+                        if event.type == pygame.KEYDOWN:
+                            if active == True:
+                                if event.key == pygame.K_BACKSPACE:
+                                    self.user_id = self.user_id[:-1]
+                                else:
+                                    self.user_id += event.unicode
+
+                        #background of the home page
+                        self.window.blit(bg, (0,0))
+
+                        #active functionality of the mouse box ID
+                        if active:
+                            color = rectangle_box_active_color
+                        else:
+                            color = rectangle_box_passive_color
+
+                        #check the position of the player's mouse 
+                        # and change the color of the play button, depending on it
+                        mouse = pygame.mouse.get_pos()
+                        if 350 <= mouse[0] <= 850 and 350 <= mouse[1] <= 500:
+                            pygame.draw.rect(self.window,light_color_for_play_button,[350, 350, 500, 150])
+
+                            #check if the player has started the game and change the background if so
+                            if event.type == pygame.MOUSEBUTTONDOWN:
+                                #Check if game can be started!!! (Send a request to the server to start the game and then send a request
+                                # to get newest gamestate, so we can check if the game has started)
+                                self.n.send("start")
+                                game = self.n.send("get")
+                        else:
+                            pygame.draw.rect(self.window, dark_color_for_play_button,[350, 350, 500, 150])
+
+                        #draw the ID boxes
+                        if clicked == False:
+                            pygame.draw.rect(self.window,rectangle_box_active_color, [430, 520, 160, 35], 2)
+                            pygame.draw.rect(self.window, rectangle_box_active_color, rectangle_box)
+                            text_surface = base_font.render(self.user_id, True, WHITE)
+                            self.window.blit(text_surface, (rectangle_box.x + 5, rectangle_box.y + 5))
+                            rectangle_box.w = max(150, text_surface.get_width() + 10)
+                    
+                    
+                    if clicked == False:
+                        #draw the texts from the buttons
+                        self.window.blit(text ,(418,365))
+                        self.window.blit(id_text, (462,528))
 
                 pygame.display.update()
