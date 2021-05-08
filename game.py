@@ -68,8 +68,16 @@ class Game:
             self.started = game.isPlaying()
           
             if self.started == 1 or self.started == 2:
+                print("Playing")
                 self.window.fill(BLACK)
                 clicked = True
+
+                pygame.draw.line(self.window, (255, 0 ,255), (600,0), (600,600), 3)
+                
+                player_text1 = smallfont_ID.render("You" , True , WHITE)
+                self.window.blit(player_text1,(200,550))
+                player_text2 = smallfont_ID.render("Enemy" , True , WHITE)
+                self.window.blit(player_text2,(800,550))
 
                 #draw the board
                 height = 47
@@ -117,13 +125,6 @@ class Game:
                                 pygame.draw.rect(self.window, BLACK, [(margin + height) * column + margin, (margin + height) * row + margin, height, height]) 
                             if game.player1Guessed[row][column] == 2:
                                 pygame.draw.rect(self.window, RED, [(margin + height) * column + margin, (margin + height) * row + margin, height, height]) 
-
-                pygame.draw.line(self.window, (255, 0 ,255), (600,0), (600,600), 3)
-                
-                player_text1 = smallfont_ID.render("You" , True , WHITE)
-                self.window.blit(player_text1,(200,550))
-                player_text2 = smallfont_ID.render("Enemy" , True , WHITE)
-                self.window.blit(player_text2,(800,550))
                 
                 #pygame.display.update()
 
@@ -132,13 +133,13 @@ class Game:
                 if player1Or2 == 0:
                     player1Or2 = 2
                 
-                if not ((player1Or2 == 1 and game.player1EndedPlacing == 1) or (player1Or2 == 2 and game.player2EndedPlacing == 1)):
+                if game.isPlaying() == 1:
                     import random
 
                     cardinals = ['N', 'S', 'E', 'W']
                     v = [2, 3, 4, 6]
                     
-                    orient = cardinals[0]
+                    orient = cardinals[3]
 
                     if self.boatType < 4:
                         dimension = v[self.boatType]
@@ -167,10 +168,13 @@ class Game:
                                     self.n.send(f"place {dimension} {a} {b} {orient}")
                                     game = self.n.send("get")
                                     #draw a black  rectangle on the previous text to make the next one visible :)
-                                    pygame.draw.rect(self.window, BLACK, [110, 560, 700, 600])
+                                    pygame.draw.rect(self.window, BLACK, [110, 540, 700, 600])
                     else:
-                        placing = smallfont_ID.render("Wait for opponent to place their boats" , True , WHITE)
-                        self.window.blit(placing,(120,570))
+                        if game.isPlaying() == 2:
+                            pygame.draw.rect(self.window, BLACK, [110, 540, 700, 600])
+                        else:
+                            placing = smallfont_ID.render("Wait for opponent to place their boats" , True , WHITE)
+                            self.window.blit(placing,(120,570))
                     
                     pygame.display.update()  
 
@@ -184,6 +188,7 @@ class Game:
 
             #Game is finished
             if self.started == 3:
+                #self.n.send("reset")
                 pass
 
             

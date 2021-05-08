@@ -64,7 +64,7 @@ def threaded_client(conn, playerId, gameId):
                     if player1Or2 == 0:
                         player1Or2 = 2
 
-                    print(currentGame.placeBoat(boatType, boatStartX, boatStartY, boatOrientation, player1Or2))
+                    currentGame.placeBoat(boatType, boatStartX, boatStartY, boatOrientation, player1Or2)
         except:
             break
 
