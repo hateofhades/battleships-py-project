@@ -16,21 +16,17 @@ class gameServer:
 
         self.player1Boats = 0
         self.player2Boats = 0
-        
-        self.placeBoat(2, 0, 5, "S", 1)
-        self.placeBoat(4, 5, 5, "W", 2)
 
-        self.guessPlayer1(0, 5)
-        self.guessPlayer2(4, 4)
-        self.guessPlayer1(5, 5)
-        self.guessPlayer1(6, 6)
-        self.guessPlayer2(0, 5)
+        self.player1EndedPlacing = 0
+        self.player2EndedPlacing = 0
 
     #Very bad code needs a lot of refractoring
     #First checks if initial and last positions are valid (if not returns error code -1)
     #Then checks if all positions are unnocupied (if not returns error code -2)
     #If all are unnocupied occupy them
     def placeBoat(self, boatType, boatStartX, boatStartY, boatOrientation, playerId):
+        if self.isPlaying == 1:
+            return -3
         if boatStartX < 0 or boatStartX >= 10 or boatStartY < 0 or boatStartY >= 10:
             return -1
         if playerId == 1:
@@ -187,6 +183,9 @@ class gameServer:
                     return 1
                 else:
                     return -2
+        
+        if self.player1Boats == self.player2Boats and self.player2Boats == 31:
+            self.isPlaying = 2
 
     #Will return 0 if game ended or didn't start
     def isPlaying(self):
@@ -217,6 +216,8 @@ class gameServer:
         self.started = 1
     
     def guessPlayer1(self, x, y):
+        if self.isPlaying != 2:
+            return -1
         #If it's not player 1 turn return with error code -1
         if self.whoPlays == 2: 
             return -1
@@ -232,7 +233,7 @@ class gameServer:
             self.player2Boats -= 1
 
             if self.player2Boats == 0:
-                self.isPlaying = 0
+                self.isPlaying = 3
                 self.won = "1"
         else:
             self.player1Guessed[x][y] = 1
@@ -241,6 +242,8 @@ class gameServer:
         return self.player1Guessed[x][y]
     
     def guessPlayer2(self, x, y):
+        if self.isPlaying != 2:
+            return -1
         #If it's not player 2 turn return with error code -1
         if self.whoPlays == 1: 
             return -1
@@ -256,7 +259,7 @@ class gameServer:
             self.player1Boats -= 1
 
             if self.player1Boats == 0:
-                self.isPlaying = 0
+                self.isPlaying = 3
                 self.won = "2"
         else:
             self.player2Guessed[x][y] = 1

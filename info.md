@@ -24,3 +24,5 @@ Stagii joc:
     3. Atacare pe rand (Daca nimeresti ataci iar) (Client -> Server; BlockID (Ex A1); Server -> Ambii client; Hit sau Miss (daca trimite hit clientul ghiceste iar))
     4. Casigator =  Primul care distruge toate barcile (Server -> Ambii clienti; Castigatorul)
 
+gameLogic:
+    started = 0 - oprit, 1 - plasare barci, 2 - guess time, 3 - ended game
