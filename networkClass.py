@@ -1,3 +1,4 @@
+#Most of the networking was done thanks to https://www.techwithtim.net/tutorials/python-online-game-tutorial/server/
 import socket
 import pickle
 import struct
@@ -24,6 +25,7 @@ class Network:
         except socket.error as e:
             print(e)
 
+    #Functions thanks to https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
     def recv_msg(self, sock):
         # Read message length and unpack it into an integer
         raw_msglen = self.recvall(sock, 4)

@@ -1,3 +1,4 @@
+#Most of the networking was done thanks to https://www.techwithtim.net/tutorials/python-online-game-tutorial/server/
 import socket
 from gameLogic import gameServer
 from _thread import *
@@ -26,6 +27,7 @@ except socket.error as e:
 s.listen(2)
 print("Waiting for a new connection.")
 
+#Function thanks to https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
 def send_msg(sock, msg):
     # Prefix each message with a 4-byte length (network byte order)
     msg = struct.pack('>I', len(msg)) + msg
