@@ -4,9 +4,6 @@ from gameLogic import gameServer
 import sys
 import os
 
-#Place boat command
-#self.n.send("place marime-barca x y orientare")
-#game = self.n.send("get")
 
 currentFolder = os.path.dirname(os.path.abspath(__file__))
 backgroundImage = os.path.join(currentFolder, 'homepage_background.jpg')
@@ -38,7 +35,7 @@ rectangle_box_active_color = (114,121,121)
 rectangle_box_passive_color = WHITE
 smallfont_ID = pygame.font.SysFont('Corbel',32)
 id_text = smallfont_ID.render('Player ID: ' , True , WHITE)
-# 
+
 #Create Background
 back_ground = pygame.image.load(backgroundImage)
 bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
@@ -67,14 +64,12 @@ class Game:
             game = gameServer(None, None, None)
             game = self.n.send("get")
             self.started = game.isPlaying()
-
-            
-            
+          
             if self.started == 1:
                 self.window.fill(BLACK)
                 clicked = True
 
-                #draw the tables
+                #draw the board
                 height = 47
                 margin = 5
 
@@ -123,17 +118,48 @@ class Game:
 
                 pygame.draw.line(self.window, (255, 0 ,255), (600,0), (600,600), 3)
                 
-
                 player_text1 = smallfont_ID.render("You" , True , WHITE)
                 self.window.blit(player_text1,(200,550))
                 player_text2 = smallfont_ID.render("Enemy" , True , WHITE)
                 self.window.blit(player_text2,(800,550))
                 
-                pygame.display.update()
-            
-            
-            
-            
+                #pygame.display.update()
+
+                #init the boats
+                import random
+
+                cardinals = ['N', 'S', 'E', 'W']
+                v = [2, 3, 4, 6]
+
+                for i in range(4):
+                    for j in range(i+1):
+                        #generate random orientations for the boats
+                        p1 = random.choice(cardinals)
+                        p2 = random.choice(cardinals)
+                        while p2 == p1:
+                            p2 = random.choice(cardinals)
+                        dimension = v[3 - i]
+                        txt = "Place a {} blocks boat with orientation {}-{}".format(dimension, p1, p2)
+                        placing = smallfont_ID.render(txt , True , WHITE)
+                        self.window.blit(placing,(120,570))
+                        
+                        for event in pygame.event.get():
+                            if event.type == pygame.MOUSEBUTTONDOWN:
+                                mouse_pos = pygame.mouse.get_pos()
+                                a = mouse_pos[0] // (height + margin)
+                                b = mouse_pos[1] // (height + margin)
+                                                        
+                                print(a,b)
+                                
+                                #send the info to the server
+                                self.n.send(f"place {dimension} {a} {b} {p2}")
+                                game = self.n.send("get")
+                                #draw a black  rectangle on the previous text to make the next one visible :)
+                                pygame.draw.rect(self.window, BLACK, [110, 560, 700, 600])
+
+                pygame.display.update()            
+
+
             
             
             
