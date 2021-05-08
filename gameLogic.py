@@ -19,60 +19,125 @@ class gameServer:
 
         self.player1EndedPlacing = 0
         self.player2EndedPlacing = 0
-
-    #Very bad code needs a lot of refractoring
+        
     #First checks if initial and last positions are valid (if not returns error code -1)
     #Then checks if all positions are unnocupied (if not returns error code -2)
     #If all are unnocupied occupy them
     def placeBoat(self, boatType, boatStartX, boatStartY, boatOrientation, playerId):
         if self.isPlaying() != 1:
-            print("Game not started!")
             return 0
         if boatStartX >= 10 or boatStartX < 0 or boatStartY >= 10 or boatStartY < 0:
-            print("Invalid starting positions")
             return -1
         
+        validPlayer1 = 1
+        validPlayer2 = 1
+
         if boatOrientation == "N":
             boatEndY = boatStartY - boatType + 1
             if boatEndY >= 10 or boatEndY < 0:
-                print("Invalid ending positions")
                 return -1
-
-            validPlayer1 = 1
-            validPlayer2 = 1
 
             for y in range(boatEndY, boatStartY + 1):
                 if self.player1Table[y][boatStartX] != 0:
-                    print(f"Boats exists in {boatStartX}|{y}")
                     validPlayer1 = 0
                 if self.player2Table[y][boatStartX] != 0:
                     validPlayer2 = 0
-                    print(f"Boats exists in {boatStartX}|{y}")
             
             if playerId == 1 and validPlayer1 == 1:
+                self.player1Boats += 1
+                if self.player1Boats == 10 and self.player2Boats == 10:
+                    self.started = 2
                 for y in range(boatEndY, boatStartY + 1):
                     self.player1Table[y][boatStartX] = 1
                 return 1
             elif playerId == 2 and validPlayer2 == 1:
+                self.player2Boats += 1
+                if self.player1Boats == 10 and self.player2Boats == 10:
+                    self.started = 2
                 for y in range(boatEndY, boatStartY + 1):
                     self.player2Table[y][boatStartX] = 1
                 return 1
-            print("Boat existed or smth")
             return -1
         elif boatOrientation == "S":
             boatEndY = boatStartY + boatType - 1
             if boatEndY >= 10 or boatEndY < 0:
                 return -1
+            
+            for y in range(boatStartY, boatEndY + 1):
+                if self.player1Table[y][boatStartX] != 0:
+                    validPlayer1 = 0
+                if self.player2Table[y][boatStartX] != 0:
+                    validPlayer2 = 0
+            
+            if playerId == 1 and validPlayer1 == 1:
+                self.player1Boats += 1
+                if self.player1Boats == 10 and self.player2Boats == 10:
+                    self.started = 2
+                for y in range(boatStartY, boatEndY + 1):
+                    self.player1Table[y][boatStartX] = 1
+                return 1
+            elif playerId == 2 and validPlayer2 == 1:
+                self.player2Boats += 1
+                if self.player1Boats == 10 and self.player2Boats == 10:
+                    self.started = 2
+                for y in range(boatStartY, boatEndY + 1):
+                    self.player2Table[y][boatStartX] = 1
+                return 1
+            return -1
 
         elif boatOrientation == "E":
             boatEndX = boatStartX + boatType - 1
             if boatEndX >= 10 or boatEndX < 0:
                 return -1
+            
+            for x in range(boatStartX, boatEndX + 1):
+                if self.player1Table[boatStartY][x] != 0:
+                    validPlayer1 = 0
+                if self.player2Table[boatStartY][x] != 0:
+                    validPlayer2 = 0
+            
+            if playerId == 1 and validPlayer1 == 1:
+                self.player1Boats += 1
+                if self.player1Boats == 10 and self.player2Boats == 10:
+                    self.started = 2
+                for x in range(boatStartX, boatEndX + 1):
+                    self.player1Table[boatStartY][x] = 1
+                return 1
+            elif playerId == 2 and validPlayer2 == 1:
+                self.player2Boats += 1
+                if self.player1Boats == 10 and self.player2Boats == 10:
+                    self.started = 2
+                for x in range(boatStartX, boatEndX + 1):
+                    self.player2Table[boatStartY][x] = 1
+                return 1
+            return -1
 
         elif boatOrientation == "W":
             boatEndX = boatStartX - boatType + 1
             if boatEndX >= 10 or boatEndX < 0:
                 return -1
+
+            for x in range(boatEndX, boatStartX + 1):
+                if self.player1Table[boatStartY][x] != 0:
+                    validPlayer1 = 0
+                if self.player2Table[boatStartY][x] != 0:
+                    validPlayer2 = 0
+            
+            if playerId == 1 and validPlayer1 == 1:
+                self.player1Boats += 1
+                if self.player1Boats == 10 and self.player2Boats == 10:
+                    self.started = 2
+                for x in range(boatEndX, boatStartX + 1):
+                    self.player1Table[boatStartY][x] = 1
+                return 1
+            elif playerId == 2 and validPlayer2 == 1:
+                self.player2Boats += 1
+                if self.player1Boats == 10 and self.player2Boats == 10:
+                    self.started = 2
+                for x in range(boatEndX, boatStartX + 1):
+                    self.player2Table[boatStartY][x] = 1
+                return 1
+            return -1
 
 
     #Will return 0 if game ended or didn't start
