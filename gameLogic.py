@@ -69,7 +69,7 @@ class gameServer:
                 else:
                     return -2
             elif boatOrientation == "N":
-                if(boatStartX - boatType + 1 < 0 or boatStartX - boatType + 1 >= 10):
+                if(boatStartY - boatType + 1 < 0 or boatStartY - boatType + 1 >= 10):
                     return -1
 
                 validPlacement = 1
