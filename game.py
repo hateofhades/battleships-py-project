@@ -46,6 +46,7 @@ class Game:
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Battleships")
         self.n = Network()
+        print(self.n.id)
         self.started = 0
         self.boatType = 0
         self.totalPutBoat = 0

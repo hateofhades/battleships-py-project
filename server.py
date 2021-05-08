@@ -3,6 +3,7 @@ from gameLogic import gameServer
 from _thread import *
 import sys
 import pickle
+import struct
 
 #Creating the array of games
 games = {}
@@ -25,8 +26,13 @@ except socket.error as e:
 s.listen(2)
 print("Waiting for a new connection.")
 
+def send_msg(sock, msg):
+    # Prefix each message with a 4-byte length (network byte order)
+    msg = struct.pack('>I', len(msg)) + msg
+    sock.sendall(msg)
+
 def threaded_client(conn, playerId, gameId):
-    conn.send(str.encode(str(playerId)))
+    send_msg(conn, str.encode(str(playerId)))
     reply = ""
     ok = 0
 
@@ -42,7 +48,7 @@ def threaded_client(conn, playerId, gameId):
             else:
                 data = data.split(" ")
                 if data[0] == "hit":
-                    conn.sendall(pickle.dumps(currentGame))
+                    send_msg(conn, pickle.dumps(currentGame))
                     print(data[1],data[2])
                     if playerId % 2 == 1:
                         print(currentGame.guessPlayer1(int(data[1]), int(data[2])))
@@ -50,12 +56,12 @@ def threaded_client(conn, playerId, gameId):
                         currentGame.guessPlayer2(int(data[1]), int(data[2]))
                         
                 elif data[0] == "get":
-                    conn.sendall(pickle.dumps(currentGame))
+                    send_msg(conn, pickle.dumps(currentGame))
                 elif data[0] == "start":
-                    conn.sendall(pickle.dumps(currentGame))
+                    send_msg(conn, pickle.dumps(currentGame))
                     currentGame.start()
                 elif data[0] == "place":
-                    conn.sendall(pickle.dumps(currentGame))
+                    send_msg(conn, pickle.dumps(currentGame))
                     boatType = int(data[1])
                     boatStartX = int(data[2])
                     boatStartY = int(data[3])
@@ -67,7 +73,7 @@ def threaded_client(conn, playerId, gameId):
 
                     currentGame.placeBoat(boatType, boatStartX, boatStartY, boatOrientation, player1Or2)
                 elif data[0] == "reset":
-                    conn.sendall(pickle.dumps(currentGame))
+                    send_msg(conn, pickle.dumps(currentGame))
                     currentGame.resetGame()
 
         except:
