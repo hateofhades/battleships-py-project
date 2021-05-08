@@ -12,10 +12,19 @@ class gameServer:
         self.player1Table = np.zeros((10, 10))
         self.player2Table = np.zeros((10, 10))
         self.player1Guessed = np.zeros((10, 10))
-        self.player2Guessed = np.zeros((10, 10))
+        self.player2Guessed = np.zeros((10, 10))       
 
         self.player1Boats = 0
         self.player2Boats = 0
+        
+        self.placeBoat(2, 0, 5, "S", 1)
+        self.placeBoat(4, 5, 5, "W", 2)
+
+        self.guessPlayer1(0, 5)
+        self.guessPlayer2(4, 4)
+        self.guessPlayer1(5, 5)
+        self.guessPlayer1(6, 6)
+        self.guessPlayer2(0, 5)
 
     #Very bad code needs a lot of refractoring
     #First checks if initial and last positions are valid (if not returns error code -1)
