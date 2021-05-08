@@ -140,31 +140,39 @@ class Game:
                     
                     orient = cardinals[0]
 
-                    dimension = v[self.boatType]
+                    if self.boatType < 4:
+                        dimension = v[self.boatType]
+                    else:
+                        dimension = 0
 
-                    txt = "Place a {} blocks boat with orientation {}".format(dimension, orient)
-                    placing = smallfont_ID.render(txt , True , WHITE)
-                    self.window.blit(placing,(120,570))
+                    if dimension > 0:
+                        txt = "Place a {} blocks boat with orientation {}".format(dimension, orient)
+                        placing = smallfont_ID.render(txt , True , WHITE)
+                        self.window.blit(placing,(120,570))
+                        
+                        for event in pygame.event.get():
+                            if event.type == pygame.MOUSEBUTTONDOWN:
+                                mouse_pos = pygame.mouse.get_pos()
+                                print(mouse_pos)
+                                a = mouse_pos[0] // (height + margin)
+                                b = mouse_pos[1] // (height + margin)
+                                print(a, b)
+
+                                if game.placeBoat(dimension, a, b, orient, player1Or2) == 1:
+                                    self.totalPutBoat += 1
+                                    if self.totalPutBoat == 4 - self.boatType:
+                                        self.totalPutBoat = 0
+                                        self.boatType += 1
+                                    #send the info to the server
+                                    self.n.send(f"place {dimension} {a} {b} {orient}")
+                                    game = self.n.send("get")
+                                    #draw a black  rectangle on the previous text to make the next one visible :)
+                                    pygame.draw.rect(self.window, BLACK, [110, 560, 700, 600])
+                    else:
+                        placing = smallfont_ID.render("Wait for opponent to place their boats" , True , WHITE)
+                        self.window.blit(placing,(120,570))
                     
-                    for event in pygame.event.get():
-                        if event.type == pygame.MOUSEBUTTONDOWN:
-                            mouse_pos = pygame.mouse.get_pos()
-                            print(mouse_pos)
-                            a = mouse_pos[0] // (height + margin)
-                            b = mouse_pos[1] // (height + margin)
-                            print(a, b)
-
-                            if game.placeBoat(dimension, a, b, orient, player1Or2) == 1:
-                                self.totalPutBoat += 1
-                                if self.totalPutBoat == 4 - self.boatType:
-                                    self.totalPutBoat = 0
-                                    self.boatType += 1
-                                #send the info to the server
-                                self.n.send(f"place {dimension} {b} {a} {orient}")
-                                game = self.n.send("get")
-                                #draw a black  rectangle on the previous text to make the next one visible :)
-                                pygame.draw.rect(self.window, BLACK, [110, 560, 700, 600])
-                        pygame.display.update()  
+                    pygame.display.update()  
 
                 #Guess (self.n.send("hit x y"))
                 #self.n.send("get")
