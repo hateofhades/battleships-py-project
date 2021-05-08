@@ -132,7 +132,7 @@ class Game:
                 if player1Or2 == 0:
                     player1Or2 = 2
                 
-                if !((player1Or2 == 1 and game.player1EndedPlacing == 1) or (player1Or2 == 2 and game.player2EndedPlacing == 1)):
+                if not ((player1Or2 == 1 and game.player1EndedPlacing == 1) or (player1Or2 == 2 and game.player2EndedPlacing == 1)):
                     import random
 
                     cardinals = ['N', 'S', 'E', 'W']
@@ -164,17 +164,19 @@ class Game:
                                 game = self.n.send("get")
                                 #draw a black  rectangle on the previous text to make the next one visible :)
                                 pygame.draw.rect(self.window, BLACK, [110, 560, 700, 600])
+                        pygame.display.update()  
+
                 #Guess (self.n.send("hit x y"))
                 #self.n.send("get")
                 if self.started == 2:
                     if game.whoPlays == player1Or2:
+                        pass
                         #Send guess to server
-            
-
                 pygame.display.update()            
 
             #Game is finished
             if self.started == 3:
+                pass
 
             
             
