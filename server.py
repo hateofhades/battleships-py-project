@@ -53,7 +53,7 @@ def threaded_client(conn, playerId, gameId):
                     send_msg(conn, pickle.dumps(currentGame))
                     print(data[1],data[2])
                     if playerId % 2 == 1:
-                        print(currentGame.guessPlayer1(int(data[1]), int(data[2])))
+                        currentGame.guessPlayer1(int(data[1]), int(data[2]))
                     else:
                         currentGame.guessPlayer2(int(data[1]), int(data[2]))
                         

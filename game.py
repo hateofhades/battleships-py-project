@@ -64,6 +64,8 @@ class Game:
             game = gameServer(None, None, None)
             game = self.n.send("get")
             self.started = game.isPlaying()
+
+            print(self.started)
           
             if self.started == 1 or self.started == 2:
                 self.window.fill(BLACK)
@@ -192,7 +194,8 @@ class Game:
                                 a = (mouse_pos[0] - 660) // (height + margin)
                                 b = mouse_pos[1] // (height + margin)
                                 print(a,b)
-                                self.n.send(f"hit {b} {a}")
+                                if a >= 0 and b >= 0:
+                                    self.n.send(f"hit {b} {a}")
                                 game = self.n.send("get")
                         
                     else:
@@ -200,14 +203,13 @@ class Game:
                         self.window.blit(placing,(120,570))
                         #Send guess to server
                 pygame.display.update()            
-
             #Game is finished
-            if self.started == 3:
-                game = self.n.send("get")
+            elif self.started == 3:
                 currentFolder = os.path.dirname(os.path.abspath(__file__))
                 backgroundImage = os.path.join(currentFolder, 'final_background.jpeg')
                 back_ground = pygame.image.load(backgroundImage)
                 bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
+                self.window.blit(bg, (0,0))
             
 
             
