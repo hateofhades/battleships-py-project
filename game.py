@@ -64,8 +64,6 @@ class Game:
             game = gameServer(None, None, None)
             game = self.n.send("get")
             self.started = game.isPlaying()
-
-            print(self.started)
           
             if self.started == 1 or self.started == 2:
                 self.window.fill(BLACK)

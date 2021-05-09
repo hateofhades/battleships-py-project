@@ -51,7 +51,6 @@ def threaded_client(conn, playerId, gameId):
                 data = data.split(" ")
                 if data[0] == "hit":
                     send_msg(conn, pickle.dumps(currentGame))
-                    print(data[1],data[2])
                     if playerId % 2 == 1:
                         currentGame.guessPlayer1(int(data[1]), int(data[2]))
                     else:
