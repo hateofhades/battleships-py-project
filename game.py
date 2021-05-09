@@ -5,9 +5,6 @@ import sys
 import os
 
 
-currentFolder = os.path.dirname(os.path.abspath(__file__))
-backgroundImage = os.path.join(currentFolder, 'homepage_background.jpg')
-
 pygame.init()
 frame_rate = pygame.time.Clock()
 
@@ -37,8 +34,7 @@ smallfont_ID = pygame.font.SysFont('Corbel',32)
 id_text = smallfont_ID.render('Player ID: ' , True , WHITE)
 
 #Create Background
-back_ground = pygame.image.load(backgroundImage)
-bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
+
 
 #class of in-game items
 class Game:
@@ -207,8 +203,11 @@ class Game:
 
             #Game is finished
             if self.started == 3:
-                self.n.send("reset")
                 game = self.n.send("get")
+                currentFolder = os.path.dirname(os.path.abspath(__file__))
+                backgroundImage = os.path.join(currentFolder, 'final_background.jpeg')
+                back_ground = pygame.image.load(backgroundImage)
+                bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
             
 
             
@@ -238,6 +237,10 @@ class Game:
                                     self.user_id += event.unicode
 
                         #background of the home page
+                        currentFolder = os.path.dirname(os.path.abspath(__file__))
+                        backgroundImage = os.path.join(currentFolder, 'homepage_background.jpg')
+                        back_ground = pygame.image.load(backgroundImage)
+                        bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
                         self.window.blit(bg, (0,0))
 
                         #active functionality of the mouse box ID
