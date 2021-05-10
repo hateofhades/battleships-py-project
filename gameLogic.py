@@ -1,253 +1,261 @@
 import numpy as np
 
-class gameServer:
-    def __init__(self, playerId1, playerId2, gameId):
-        self.player1 = playerId1
-        self.player2 = playerId2
-        self.gameId = gameId
+class GameServer:
+    def __init__(self, player_id_1, player_id_2, game_id):
+        
+        self.player_1 = player_id_1
+        self.player_2 = player_id_2
+
+        self.game_id = game_id
         self.started = 0
-        self.whoPlays = 1
+        self.who_plays = 1
         self.won = 0
 
-        self.player1Table = np.zeros((10, 10))
-        self.player2Table = np.zeros((10, 10))
-        self.player1Guessed = np.zeros((10, 10))
-        self.player2Guessed = np.zeros((10, 10))       
+        self.player_1_table = np.zeros((10, 10))
+        self.player_2_table = np.zeros((10, 10))
 
-        self.player1Boats = 0
-        self.player2Boats = 0
+        self.player_1_guessed = np.zeros((10, 10))
+        self.player_2_guessed = np.zeros((10, 10))       
 
-        self.player1EndedPlacing = 0
-        self.player2EndedPlacing = 0
+        self.player_1_boats = 0
+        self.player_2_boats = 0
+
+        self.player_1_ended_placing = 0
+        self.player_1_ended_placing = 0
         
     #First checks if initial and last positions are valid (if not returns error code -1)
     #Then checks if all positions are unnocupied (if not returns error code -2)
     #If all are unnocupied occupy them
-    def placeBoat(self, boatType, boatStartX, boatStartY, boatOrientation, playerId):
-        if self.isPlaying() != 1:
+    def place_boat(self, boat_type, boat_start_x, boat_start_y, boat_orientation, player_id):
+        if self.is_playing() != 1:
             return 0
-        if boatStartX >= 10 or boatStartX < 0 or boatStartY >= 10 or boatStartY < 0:
+        if boat_start_x >= 10 or boat_start_x < 0 or boat_start_y >= 10 or boat_start_y < 0:
             return -1
         
-        validPlayer1 = 1
-        validPlayer2 = 1
+        valid_player_1 = 1
+        valid_player_2 = 1
 
-        if boatOrientation == "N":
-            boatEndY = boatStartY - boatType + 1
-            if boatEndY >= 10 or boatEndY < 0:
+        if boat_orientation == "N":
+            boat_end_y = boat_start_y - boat_type + 1
+            if boat_end_y >= 10 or boat_end_y < 0:
                 return -1
 
-            for y in range(boatEndY, boatStartY + 1):
-                if self.player1Table[y][boatStartX] != 0:
-                    validPlayer1 = 0
-                if self.player2Table[y][boatStartX] != 0:
-                    validPlayer2 = 0
+            for y in range(boat_end_y, boat_start_y + 1):
+                if self.player_1_table[y][boat_start_x] != 0:
+                    valid_player_1 = 0
+                if self.player_2_table[y][boat_start_x] != 0:
+                    valid_player_2 = 0
             
-            if playerId == 1 and validPlayer1 == 1:
-                self.player1Boats += 1
-                if self.player1Boats == 10 and self.player2Boats == 10:
+            if player_id == 1 and valid_player_1 == 1:
+                self.player_1_boats += 1
+                if self.player_1_boats == 10 and self.player_2_boats == 10:
                     self.started = 2
-                    self.player1Boats = 31
-                    self.player2Boats = 31
-                for y in range(boatEndY, boatStartY + 1):
-                    self.player1Table[y][boatStartX] = 1
+                    self.player_1_boats = 31
+                    self.player_2_boats = 31
+                for y in range(boat_end_y, boat_start_y + 1):
+                    self.player_1_table[y][boat_start_x] = 1
                 return 1
-            elif playerId == 2 and validPlayer2 == 1:
-                self.player2Boats += 1
-                if self.player1Boats == 10 and self.player2Boats == 10:
+
+            elif player_id == 2 and valid_player_2 == 1:
+                self.player_2_boats += 1
+                if self.player_1_boats == 10 and self.player_2_boats == 10:
                     self.started = 2
-                    self.player1Boats = 31
-                    self.player2Boats = 31
-                for y in range(boatEndY, boatStartY + 1):
-                    self.player2Table[y][boatStartX] = 1
-                return 1
-            return -1
-        elif boatOrientation == "S":
-            boatEndY = boatStartY + boatType - 1
-            if boatEndY >= 10 or boatEndY < 0:
-                return -1
-            
-            for y in range(boatStartY, boatEndY + 1):
-                if self.player1Table[y][boatStartX] != 0:
-                    validPlayer1 = 0
-                if self.player2Table[y][boatStartX] != 0:
-                    validPlayer2 = 0
-            
-            if playerId == 1 and validPlayer1 == 1:
-                self.player1Boats += 1
-                if self.player1Boats == 10 and self.player2Boats == 10:
-                    self.started = 2
-                    self.player1Boats = 31
-                    self.player2Boats = 31
-                for y in range(boatStartY, boatEndY + 1):
-                    self.player1Table[y][boatStartX] = 1
-                return 1
-            elif playerId == 2 and validPlayer2 == 1:
-                self.player2Boats += 1
-                if self.player1Boats == 10 and self.player2Boats == 10:
-                    self.started = 2
-                    self.player1Boats = 31
-                    self.player2Boats = 31
-                for y in range(boatStartY, boatEndY + 1):
-                    self.player2Table[y][boatStartX] = 1
+                    self.player_1_boats = 31
+                    self.player_2_boats = 31
+                for y in range(boat_end_y, boat_start_y + 1):
+                    self.player_2_table[y][boat_start_x] = 1
                 return 1
             return -1
 
-        elif boatOrientation == "E":
-            boatEndX = boatStartX + boatType - 1
-            if boatEndX >= 10 or boatEndX < 0:
+        elif boat_orientation == "S":
+            boat_end_y = boat_start_y + boat_type - 1
+            if boat_end_y >= 10 or boat_end_y < 0:
                 return -1
             
-            for x in range(boatStartX, boatEndX + 1):
-                if self.player1Table[boatStartY][x] != 0:
-                    validPlayer1 = 0
-                if self.player2Table[boatStartY][x] != 0:
-                    validPlayer2 = 0
+            for y in range(boat_start_y, boat_end_y + 1):
+                if self.player_1_table[y][boat_start_x] != 0:
+                    valid_player_1 = 0
+                if self.player_2_table[y][boat_start_x] != 0:
+                    valid_player_2 = 0
             
-            if playerId == 1 and validPlayer1 == 1:
-                self.player1Boats += 1
-                if self.player1Boats == 10 and self.player2Boats == 10:
+            if player_id == 1 and valid_player_1 == 1:
+                self.player_1_boats += 1
+                if self.player_1_boats == 10 and self.player_2_boats == 10:
                     self.started = 2
-                    self.player1Boats = 31
-                    self.player2Boats = 31
-                for x in range(boatStartX, boatEndX + 1):
-                    self.player1Table[boatStartY][x] = 1
+                    self.player_1_boats = 31
+                    self.player_2_boats = 31
+                for y in range(boat_start_y, boat_end_y + 1):
+                    self.player_1_table[y][boat_start_x] = 1
                 return 1
-            elif playerId == 2 and validPlayer2 == 1:
-                self.player2Boats += 1
-                if self.player1Boats == 10 and self.player2Boats == 10:
+
+            elif player_id == 2 and valid_player_2 == 1:
+                self.player_2_boats += 1
+                if self.player_1_boats == 10 and self.player_2_boats == 10:
                     self.started = 2
-                    self.player1Boats = 31
-                    self.player2Boats = 31
-                for x in range(boatStartX, boatEndX + 1):
-                    self.player2Table[boatStartY][x] = 1
+                    self.player_1_boats = 31
+                    self.player_2_boats = 31
+                for y in range(boat_start_y, boat_end_y + 1):
+                    self.player_2_table[y][boat_start_x] = 1
                 return 1
             return -1
 
-        elif boatOrientation == "W":
-            boatEndX = boatStartX - boatType + 1
-            if boatEndX >= 10 or boatEndX < 0:
+        elif boat_orientation == "E":
+            boat_end_x = boat_start_x + boat_type - 1
+            if boat_end_x >= 10 or boat_end_x < 0:
+                return -1
+            
+            for x in range(boat_start_x, boat_end_x + 1):
+                if self.player_1_table[boat_start_y][x] != 0:
+                    valid_player_1 = 0
+                if self.player_2_table[boat_start_y][x] != 0:
+                    valid_player_2 = 0
+            
+            if player_id == 1 and valid_player_1 == 1:
+                self.player_1_boats += 1
+                if self.player_1_boats == 10 and self.player_2_boats == 10:
+                    self.started = 2
+                    self.player_1_boats = 31
+                    self.player_2_boats = 31
+                for x in range(boat_start_x, boat_end_x + 1):
+                    self.player_1_table[boat_start_y][x] = 1
+                return 1
+
+            elif player_id == 2 and valid_player_2 == 1:
+                self.player_2_boats += 1
+                if self.player_1_boats == 10 and self.player_2_boats == 10:
+                    self.started = 2
+                    self.player_1_boats = 31
+                    self.player_2_boats = 31
+                for x in range(boat_start_x, boat_end_x + 1):
+                    self.player_2_table[boat_start_y][x] = 1
+                return 1
+            return -1
+
+        elif boat_orientation == "W":
+            boat_end_x = boat_start_x - boat_type + 1
+            if boat_end_x >= 10 or boat_end_x < 0:
                 return -1
 
-            for x in range(boatEndX, boatStartX + 1):
-                if self.player1Table[boatStartY][x] != 0:
-                    validPlayer1 = 0
-                if self.player2Table[boatStartY][x] != 0:
-                    validPlayer2 = 0
+            for x in range(boat_end_x, boat_start_x + 1):
+                if self.player_1_table[boat_start_y][x] != 0:
+                    valid_player_1 = 0
+                if self.player_2_table[boat_start_y][x] != 0:
+                    valid_player_2 = 0
             
-            if playerId == 1 and validPlayer1 == 1:
-                self.player1Boats += 1
-                if self.player1Boats == 10 and self.player2Boats == 10:
+            if player_id == 1 and valid_player_1 == 1:
+                self.player_1_boats += 1
+                if self.player_1_boats == 10 and self.player_2_boats == 10:
                     self.started = 2
-                    self.player1Boats = 31
-                    self.player2Boats = 31
-                for x in range(boatEndX, boatStartX + 1):
-                    self.player1Table[boatStartY][x] = 1
+                    self.player_1_boats = 31
+                    self.player_2_boats = 31
+                for x in range(boat_end_x, boat_start_x + 1):
+                    self.player_1_table[boat_start_y][x] = 1
                 return 1
-            elif playerId == 2 and validPlayer2 == 1:
-                self.player2Boats += 1
-                if self.player1Boats == 10 and self.player2Boats == 10:
+                
+            elif player_id == 2 and valid_player_2 == 1:
+                self.player_2_boats += 1
+                if self.player_1_boats == 10 and self.player_2_boats == 10:
                     self.started = 2
-                    self.player1Boats = 31
-                    self.player2Boats = 31
-                for x in range(boatEndX, boatStartX + 1):
-                    self.player2Table[boatStartY][x] = 1
+                    self.player_1_boats = 31
+                    self.player_2_boats = 31
+                for x in range(boat_end_x, boat_start_x + 1):
+                    self.player_2_table[boat_start_y][x] = 1
                 return 1
             return -1
 
 
     #Will return 0 if game ended or didn't start
-    def isPlaying(self):
+    def is_playing(self):
         return self.started
     
     def play(self, data):
         pass
 
     #Returns the status of the game (whose turn, table state, guesses made)
-    def getGameState(self):
-        return (self.isPlaying, self.whoPlays, self.player1Table, self.player2Table, self.player1Guessed, self.player2Guessed)
+    def get_game_state(self):
+        return (self.is_playing, self.who_plays, self.player_1_table, self.player_2_table, self.player_1_guessed, self.player_2_guessed)
 
     #Return who plays
-    def whichPlayerTurn(self):
-        return self.whoPlays
+    def which_player_turn(self):
+        return self.who_plays
 
-    def addPlayer1(self, playerId1):
-        self.player1 = playerId1
+    def add_player_1(self, player_id_1):
+        self.player_1 = player_id_1
     
-    def addPlayer2(self, playerId2):
-        self.player2 = playerId2
+    def add_player_2(self, player_id_2):
+        self.player_2 = player_id_2
 
     #Starting the game
     def start(self):
-        if self.player1 == None or self.player2 == None:
+        if self.player_1 == None or self.player_2 == None:
             return "Can't start game with 1 player"
 
         self.started = 1
     
-    def guessPlayer1(self, x, y):
-        if self.isPlaying() != 2:
+    def guess_player_1(self, x, y):
+        if self.is_playing() != 2:
             return -1
         #If it's not player 1 turn return with error code -1
-        if self.whoPlays == 2: 
+        if self.who_plays == 2: 
             return -1
 
         #If already guessed return with error code -2
-        if self.player1Guessed[x][y] != 0:
+        if self.player_1_guessed[x][y] != 0:
             return -2
         
-        #Get if there was a ship on player2's table, and update guessed accordingly and return it
+        #Get if there was a ship on player_2's table, and update guessed accordingly and return it
         #If missed the other player plays next
-        if self.player2Table[x][y] != 0:
-            self.player1Guessed[x][y] = 2
-            self.player2Boats -= 1
+        if self.player_2_table[x][y] != 0:
+            self.player_1_guessed[x][y] = 2
+            self.player_2_boats -= 1
 
-            if self.player2Boats == 0:
+            if self.player_2_boats == 0:
                 self.started = 3
                 self.won = 1
         else:
-            self.player1Guessed[x][y] = 1
-            self.whoPlays = 2
+            self.player_1_guessed[x][y] = 1
+            self.who_plays = 2
         
-        return self.player1Guessed[x][y]
+        return self.player_1_guessed[x][y]
     
-    def guessPlayer2(self, x, y):
-        if self.isPlaying() != 2:
+    def guess_player_2(self, x, y):
+        if self.is_playing() != 2:
             return -1
         #If it's not player 2 turn return with error code -1
-        if self.whoPlays == 1: 
+        if self.who_plays == 1: 
             return -1
 
         #If already guessed return with error code -2
-        if self.player2Guessed[x][y] != 0:
+        if self.player_2_guessed[x][y] != 0:
             return -2
         
-        #Get if there was a ship on player1's table, and update guessed accordingly and return it
+        #Get if there was a ship on player_1's table, and update guessed accordingly and return it
         #If missed the other player plays next
-        if self.player1Table[x][y] != 0:
-            self.player2Guessed[x][y] = 2
-            self.player1Boats -= 1
+        if self.player_1_table[x][y] != 0:
+            self.player_2_guessed[x][y] = 2
+            self.player_1_boats -= 1
 
-            if self.player1Boats == 0:
+            if self.player_1_boats == 0:
                 self.started = 3
                 self.won = 2
         else:
-            self.player2Guessed[x][y] = 1
-            self.whoPlays = 1
+            self.player_2_guessed[x][y] = 1
+            self.who_plays = 1
 
-        return self.player2Guessed[x][y]
+        return self.player_2_guessed[x][y]
     
-    def resetGame(self):
+    def reset_game(self):
         self.started = 0
-        self.whoPlays = 1
+        self.who_plays = 1
         self.won = 0
 
-        self.player1Table = np.zeros((10, 10))
-        self.player2Table = np.zeros((10, 10))
-        self.player1Guessed = np.zeros((10, 10))
-        self.player2Guessed = np.zeros((10, 10))       
+        self.player_1_table = np.zeros((10, 10))
+        self.player_2_table = np.zeros((10, 10))
+        self.player_1_guessed = np.zeros((10, 10))
+        self.player_2_guessed = np.zeros((10, 10))       
 
-        self.player1Boats = 0
-        self.player2Boats = 0
+        self.player_1_boats = 0
+        self.player_2_boats = 0
 
-        self.player1EndedPlacing = 0
-        self.player2EndedPlacing = 0
+        self.player_1_ended_placing = 0
+        self.player_1_ended_placing = 0
