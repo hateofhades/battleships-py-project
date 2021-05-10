@@ -44,8 +44,6 @@ rectangle_box_passive_color = WHITE
 smallfont_ID = pygame.font.SysFont('Corbel',32)
 id_text = smallfont_ID.render('Player ID: ' , True , WHITE)
 
-#Create Background
-
 
 #class of in-game items
 class Game:
@@ -83,12 +81,12 @@ class Game:
                 self.window.fill(BLACK)
                 clicked = True
 
-                pygame.draw.line(self.window, (255, 0 ,255), (600,0), (600,600), 3)
+                pygame.draw.line(self.window, (0, 250, 154), (600,0), (600,600), 3)
                 
                 player_text1 = smallfont_ID.render("You" , True , WHITE)
-                self.window.blit(player_text1,(200,550))
+                self.window.blit(player_text1,(250,540))
                 player_text2 = smallfont_ID.render("Enemy" , True , WHITE)
-                self.window.blit(player_text2,(800,550))
+                self.window.blit(player_text2,(887,540))
 
                 #draw the board
                 height = 47
@@ -137,7 +135,6 @@ class Game:
                             if game.player1Guessed[row][column] == 2:
                                 pygame.draw.rect(self.window, RED, [(margin + height) * column + margin, (margin + height) * row + margin, height, height]) 
                 
-                #pygame.display.update()
 
                 #init the boats
                 player1Or2 = int(self.n.id) % 2
@@ -191,7 +188,7 @@ class Game:
                             pygame.draw.rect(self.window, BLACK, [110, 540, 700, 600])
                         else:
                             placing = smallfont_ID.render("Wait for opponent to place their boats" , True , WHITE)
-                            self.window.blit(placing,(120,570))
+                            self.window.blit(placing,(120,560))
                     
                     pygame.display.update()  
 
@@ -207,7 +204,7 @@ class Game:
                             self.starting = 1
 
                         placing = smallfont_ID.render("Time to guess!" , True , WHITE)
-                        self.window.blit(placing,(120,570))
+                        self.window.blit(placing,(120,560))
                         for event in pygame.event.get():
                             if event.type == pygame.MOUSEBUTTONDOWN:
                                 mouse_pos = pygame.mouse.get_pos()
@@ -227,9 +224,10 @@ class Game:
                         
                     else:
                         placing = smallfont_ID.render("Waiting for opponent!" , True , WHITE)
-                        self.window.blit(placing,(120,570))
+                        self.window.blit(placing,(120,560))
                         #Send guess to server
-                pygame.display.update()            
+                pygame.display.update()  
+
             #Game is finished
             elif self.started == 3:
                 if self.winLoseSound == 0:
@@ -241,10 +239,16 @@ class Game:
 
                     self.winLoseSound = 1
 
+                #Draw the final background image
                 backgroundImage = os.path.join(currentFolder, 'final_background.jpeg')
                 back_ground = pygame.image.load(backgroundImage)
                 bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
                 self.window.blit(bg, (0,0))
+
+                #Draw the bow that show the winner
+                smallfont_winner_box = pygame.font.SysFont('Corbel',60)
+                player_text1 = smallfont_winner_box.render(f"The winner is: {game.won}" , True , WHITE)
+                self.window.blit(player_text1,(445,550))
             
             for event in pygame.event.get():
             # check if the player has closed the game   
@@ -301,6 +305,7 @@ class Game:
                             text_surface = base_font.render(self.user_id, True, WHITE)
                             self.window.blit(text_surface, (rectangle_box.x + 5, rectangle_box.y + 5))
                             rectangle_box.w = max(150, text_surface.get_width() + 10)
+                            
                     
                     
                     if clicked == False:
