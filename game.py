@@ -2,10 +2,21 @@ import pygame
 from networkClass import Network
 from gameLogic import gameServer
 import sys
-import os
+import os                    
+import random
 
+currentFolder = os.path.dirname(os.path.abspath(__file__))
 
 pygame.init()
+pygame.mixer.init()
+
+hit = pygame.mixer.Sound(os.path.join(currentFolder, 'hit.wav'))
+miss = pygame.mixer.Sound(os.path.join(currentFolder, 'miss.wav'))
+yourturn = pygame.mixer.Sound(os.path.join(currentFolder, 'yourTurn.wav'))
+win = pygame.mixer.Sound(os.path.join(currentFolder, 'win.wav'))
+lose = pygame.mixer.Sound(os.path.join(currentFolder, 'lose.wav'))
+
+
 frame_rate = pygame.time.Clock()
 
 #globals
@@ -33,8 +44,6 @@ rectangle_box_passive_color = WHITE
 smallfont_ID = pygame.font.SysFont('Corbel',32)
 id_text = smallfont_ID.render('Player ID: ' , True , WHITE)
 
-#Create Background
-
 
 #class of in-game items
 class Game:
@@ -47,6 +56,9 @@ class Game:
         self.boatType = 0
         self.totalPutBoat = 0
         self.orientation_number = 0
+        self.starting = 0
+        self.last = 0
+        self.winLoseSound = 0
 
     def draw(self):
         self.user_id = self.n.id
@@ -64,17 +76,17 @@ class Game:
             game = gameServer(None, None, None)
             game = self.n.send("get")
             self.started = game.isPlaying()
-          
+
             if self.started == 1 or self.started == 2:
                 self.window.fill(BLACK)
                 clicked = True
 
-                pygame.draw.line(self.window, (255, 0 ,255), (600,0), (600,600), 3)
+                pygame.draw.line(self.window, (0, 250, 154), (600,0), (600,600), 3)
                 
                 player_text1 = smallfont_ID.render("You" , True , WHITE)
-                self.window.blit(player_text1,(200,550))
+                self.window.blit(player_text1,(250,540))
                 player_text2 = smallfont_ID.render("Enemy" , True , WHITE)
-                self.window.blit(player_text2,(800,550))
+                self.window.blit(player_text2,(887,540))
 
                 #draw the board
                 height = 47
@@ -123,7 +135,6 @@ class Game:
                             if game.player1Guessed[row][column] == 2:
                                 pygame.draw.rect(self.window, RED, [(margin + height) * column + margin, (margin + height) * row + margin, height, height]) 
                 
-                #pygame.display.update()
 
                 #init the boats
                 player1Or2 = int(self.n.id) % 2
@@ -131,7 +142,9 @@ class Game:
                     player1Or2 = 2
                 
                 if game.isPlaying() == 1:
-                    import random
+                    if self.starting == 0:
+                        self.starting = 1
+                        yourturn.play()
 
                     cardinals = ['N', 'S', 'E', 'W']
                     v = [2, 3, 4, 6]
@@ -175,15 +188,23 @@ class Game:
                             pygame.draw.rect(self.window, BLACK, [110, 540, 700, 600])
                         else:
                             placing = smallfont_ID.render("Wait for opponent to place their boats" , True , WHITE)
-                            self.window.blit(placing,(120,570))
+                            self.window.blit(placing,(120,560))
                     
                     pygame.display.update()  
 
                 #Guess 
                 if self.started == 2:
+                    if self.last != game.whoPlays:
+                        self.starting = 0
+                        self.last = game.whoPlays
+
                     if game.whoPlays == player1Or2:
+                        if self.starting == 0:
+                            yourturn.play()
+                            self.starting = 1
+
                         placing = smallfont_ID.render("Time to guess!" , True , WHITE)
-                        self.window.blit(placing,(120,570))
+                        self.window.blit(placing,(120,560))
                         for event in pygame.event.get():
                             if event.type == pygame.MOUSEBUTTONDOWN:
                                 mouse_pos = pygame.mouse.get_pos()
@@ -193,27 +214,41 @@ class Game:
                                 b = mouse_pos[1] // (height + margin)
                                 print(a,b)
                                 if a >= 0 and b >= 0:
+                                    pygame.mixer.stop()
                                     self.n.send(f"hit {b} {a}")
+                                    if (player1Or2 == 1 and game.guessPlayer1(b, a) == 1) or (player1Or2 == 2 and game.guessPlayer2(b, a) == 1):
+                                        miss.play()
+                                    else:
+                                        hit.play()
                                 game = self.n.send("get")
                         
                     else:
                         placing = smallfont_ID.render("Waiting for opponent!" , True , WHITE)
-                        self.window.blit(placing,(120,570))
+                        self.window.blit(placing,(120,560))
                         #Send guess to server
-                pygame.display.update()            
+                pygame.display.update()  
+
             #Game is finished
             elif self.started == 3:
-                currentFolder = os.path.dirname(os.path.abspath(__file__))
+                if self.winLoseSound == 0:
+                    pygame.mixer.stop()
+                    if game.won == player1Or2:
+                        win.play()
+                    else:
+                        lose.play()
+
+                    self.winLoseSound = 1
+
+                #Draw the final background image
                 backgroundImage = os.path.join(currentFolder, 'final_background.jpeg')
                 back_ground = pygame.image.load(backgroundImage)
                 bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
                 self.window.blit(bg, (0,0))
-            
 
-            
-            
-            
-            
+                #Draw the bow that show the winner
+                smallfont_winner_box = pygame.font.SysFont('Corbel',60)
+                player_text1 = smallfont_winner_box.render(f"The winner is: {game.won}" , True , WHITE)
+                self.window.blit(player_text1,(445,550))
             
             for event in pygame.event.get():
             # check if the player has closed the game   
@@ -237,7 +272,6 @@ class Game:
                                     self.user_id += event.unicode
 
                         #background of the home page
-                        currentFolder = os.path.dirname(os.path.abspath(__file__))
                         backgroundImage = os.path.join(currentFolder, 'homepage_background.jpg')
                         back_ground = pygame.image.load(backgroundImage)
                         bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
@@ -271,6 +305,7 @@ class Game:
                             text_surface = base_font.render(self.user_id, True, WHITE)
                             self.window.blit(text_surface, (rectangle_box.x + 5, rectangle_box.y + 5))
                             rectangle_box.w = max(150, text_surface.get_width() + 10)
+                            
                     
                     
                     if clicked == False:
