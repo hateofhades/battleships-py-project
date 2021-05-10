@@ -281,6 +281,8 @@ class Game:
                                     self.user_id += event.unicode
 
                         #background of the home page
+                        #Same of the code for backgrounds was done thanks to 
+                        #https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame
                         backgroundImage = os.path.join(current_folder, 'homepage_background.jpg')
                         back_ground = pygame.image.load(backgroundImage)
                         bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
