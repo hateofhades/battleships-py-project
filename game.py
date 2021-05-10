@@ -173,9 +173,11 @@ class Game:
                                     if self.totalPutBoat == 4 - self.boatType:
                                         self.totalPutBoat = 0
                                         self.boatType += 1
+
                                     #send the info to the server
                                     self.n.send(f"place {dimension} {a} {b} {orient}")
                                     game = self.n.send("get")
+                                    
                                     #draw a black  rectangle on the previous text to make the next one visible :)
                                     pygame.draw.rect(self.window, BLACK, [110, 540, 700, 600])
                             if event.type == pygame.KEYDOWN:
