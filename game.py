@@ -2,10 +2,21 @@ import pygame
 from networkClass import Network
 from gameLogic import gameServer
 import sys
-import os
+import os                    
+import random
 
+currentFolder = os.path.dirname(os.path.abspath(__file__))
 
 pygame.init()
+pygame.mixer.init()
+
+hit = pygame.mixer.Sound(os.path.join(currentFolder, 'hit.wav'))
+miss = pygame.mixer.Sound(os.path.join(currentFolder, 'miss.wav'))
+yourturn = pygame.mixer.Sound(os.path.join(currentFolder, 'yourTurn.wav'))
+win = pygame.mixer.Sound(os.path.join(currentFolder, 'win.wav'))
+lose = pygame.mixer.Sound(os.path.join(currentFolder, 'lose.wav'))
+
+
 frame_rate = pygame.time.Clock()
 
 #globals
@@ -47,6 +58,9 @@ class Game:
         self.boatType = 0
         self.totalPutBoat = 0
         self.orientation_number = 0
+        self.starting = 0
+        self.last = 0
+        self.winLoseSound = 0
 
     def draw(self):
         self.user_id = self.n.id
@@ -64,7 +78,7 @@ class Game:
             game = gameServer(None, None, None)
             game = self.n.send("get")
             self.started = game.isPlaying()
-          
+
             if self.started == 1 or self.started == 2:
                 self.window.fill(BLACK)
                 clicked = True
@@ -131,7 +145,9 @@ class Game:
                     player1Or2 = 2
                 
                 if game.isPlaying() == 1:
-                    import random
+                    if self.starting == 0:
+                        self.starting = 1
+                        yourturn.play()
 
                     cardinals = ['N', 'S', 'E', 'W']
                     v = [2, 3, 4, 6]
@@ -181,7 +197,15 @@ class Game:
 
                 #Guess 
                 if self.started == 2:
+                    if self.last != game.whoPlays:
+                        self.starting = 0
+                        self.last = game.whoPlays
+
                     if game.whoPlays == player1Or2:
+                        if self.starting == 0:
+                            yourturn.play()
+                            self.starting = 1
+
                         placing = smallfont_ID.render("Time to guess!" , True , WHITE)
                         self.window.blit(placing,(120,570))
                         for event in pygame.event.get():
@@ -193,7 +217,12 @@ class Game:
                                 b = mouse_pos[1] // (height + margin)
                                 print(a,b)
                                 if a >= 0 and b >= 0:
+                                    pygame.mixer.stop()
                                     self.n.send(f"hit {b} {a}")
+                                    if (player1Or2 == 1 and game.guessPlayer1(b, a) == 1) or (player1Or2 == 2 and game.guessPlayer2(b, a) == 1):
+                                        miss.play()
+                                    else:
+                                        hit.play()
                                 game = self.n.send("get")
                         
                     else:
@@ -203,17 +232,19 @@ class Game:
                 pygame.display.update()            
             #Game is finished
             elif self.started == 3:
-                currentFolder = os.path.dirname(os.path.abspath(__file__))
+                if self.winLoseSound == 0:
+                    pygame.mixer.stop()
+                    if game.won == player1Or2:
+                        win.play()
+                    else:
+                        lose.play()
+
+                    self.winLoseSound = 1
+
                 backgroundImage = os.path.join(currentFolder, 'final_background.jpeg')
                 back_ground = pygame.image.load(backgroundImage)
                 bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
                 self.window.blit(bg, (0,0))
-            
-
-            
-            
-            
-            
             
             for event in pygame.event.get():
             # check if the player has closed the game   
@@ -237,7 +268,6 @@ class Game:
                                     self.user_id += event.unicode
 
                         #background of the home page
-                        currentFolder = os.path.dirname(os.path.abspath(__file__))
                         backgroundImage = os.path.join(currentFolder, 'homepage_background.jpg')
                         back_ground = pygame.image.load(backgroundImage)
                         bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
