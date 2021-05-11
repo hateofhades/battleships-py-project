@@ -149,6 +149,7 @@ class Game:
                 if game.is_playing() == 1:
                     if self.starting == 0:
                         self.starting = 1
+                        yourturn.set_volume(0.3)
                         yourturn.play()
 
                     cardinals = ['N', 'S', 'E', 'W']
@@ -229,8 +230,10 @@ class Game:
                                     pygame.mixer.stop()
                                     self.n.send(f"hit {b} {a}")
                                     if (player_1_or_2 == 1 and game.guess_player_1(b, a) == 1) or (player_1_or_2 == 2 and game.guess_player_2(b, a) == 1):
+                                        miss.set_volume(0.1)
                                         miss.play()
                                     else:
+                                        hit.set_volume(0.1)
                                         hit.play()
                                 game = self.n.send("get")
                         
@@ -247,8 +250,10 @@ class Game:
                 if self.winLoseSound == 0:
                     pygame.mixer.stop()
                     if game.won == player_1_or_2:
+                        win.set_volume(0.5)
                         win.play()
                     else:
+                        lose.set_volume(0.5)
                         lose.play()
 
                     self.winLoseSound = 1
