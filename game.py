@@ -1,9 +1,7 @@
 import pygame
 from networkClass import Network
 from gameLogic import GameServer
-import sys
 import os                    
-import random
 
 current_folder = os.path.dirname(os.path.abspath(__file__))
 
@@ -272,9 +270,9 @@ class Game:
                 smallfont_winner_box = pygame.font.SysFont('Corbel',60)
 
                 if game.won == player_1_or_2:
-                    player_text1 = smallfont_winner_box.render(f"You won!", True, WHITE)
+                    player_text1 = smallfont_winner_box.render("You won!", True, WHITE)
                 else:
-                    player_text1 = smallfont_winner_box.render(f"You lost!", True, WHITE)
+                    player_text1 = smallfont_winner_box.render("You lost!", True, WHITE)
                 self.window.blit(player_text1,(510,550))
             
             for event in pygame.event.get():

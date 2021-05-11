@@ -3,7 +3,6 @@
 import socket
 from gameLogic import GameServer
 from _thread import *
-import sys
 import pickle
 import struct
 
@@ -37,8 +36,6 @@ def send_message(sock, message):
 
 def threaded_client(conn, player_id, game_id):
     send_message(conn, str.encode(str(player_id)))
-    reply = ""
-    ok = 0
 
     current_game = games[game_id]
 
