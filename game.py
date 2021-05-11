@@ -94,7 +94,8 @@ class Game:
                 #draw the board
                 height = 47
                 margin = 5
-                #the idea of mapping the blocks after the matrix was inspired from http://programarcadegames.com/index.php?lang=en&chapter=array_backed_grids
+                #the idea of mapping the blocks after the matrix was inspired from 
+                # http://programarcadegames.com/index.php?lang=en&chapter=array_backed_grids
 
                 #all blocks are blue at first, no boat is placed
                 for row in range(10):
