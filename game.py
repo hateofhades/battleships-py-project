@@ -76,9 +76,11 @@ class Game:
 
         while running:
             game = GameServer(None, None, None)
+            #Request from the server the new gamestate every frame
             game = self.n.send("get")
             self.started = game.is_playing()
 
+            #If the game is in place or guess mode
             if self.started == 1 or self.started == 2:
                 self.window.fill(BLACK)
                 clicked = True
@@ -147,9 +149,12 @@ class Game:
                 if player_1_or_2 == 0:
                     player_1_or_2 = 2
                 
+                #If game is in hit mode
                 if game.is_playing() == 1:
+                    #If this is the first frame in hit mode play the "your turn" sound
                     if self.starting == 0:
                         self.starting = 1
+                        yourturn.set_volume(0.3)
                         yourturn.play()
 
                     cardinals = ['N', 'S', 'E', 'W']
@@ -230,8 +235,10 @@ class Game:
                                     pygame.mixer.stop()
                                     self.n.send(f"hit {b} {a}")
                                     if (player_1_or_2 == 1 and game.guess_player_1(b, a) == 1) or (player_1_or_2 == 2 and game.guess_player_2(b, a) == 1):
+                                        miss.set_volume(0.1)
                                         miss.play()
                                     else:
+                                        hit.set_volume(0.1)
                                         hit.play()
                                 game = self.n.send("get")
                         
@@ -248,8 +255,10 @@ class Game:
                 if self.winLoseSound == 0:
                     pygame.mixer.stop()
                     if game.won == player_1_or_2:
+                        win.set_volume(0.5)
                         win.play()
                     else:
+                        lose.set_volume(0.5)
                         lose.play()
 
                     self.winLoseSound = 1

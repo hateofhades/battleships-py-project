@@ -44,6 +44,7 @@ def threaded_client(conn, player_id, game_id):
 
     while True:
         try:
+            #Listen for the client
             data = conn.recv(4096).decode()
 
             if not data:
@@ -70,14 +71,12 @@ def threaded_client(conn, player_id, game_id):
                     boat_start_y = int(data[3])
                     boat_orientation = data[4]
                     
+                    #Get if player 1 or player 2 (1 if odd, 2 if even)
                     player_1_or_2 = int(player_id) % 2
                     if player_1_or_2 == 0:
                         player_1_or_2 = 2
 
                     current_game.place_boat(boat_type, boat_start_x, boat_start_y, boat_orientation, player_1_or_2)
-                elif data[0] == "reset":
-                    send_message(conn, pickle.dumps(current_game))
-                    current_game.reset_game()
 
         except:
             break
@@ -91,10 +90,12 @@ def threaded_client(conn, player_id, game_id):
     conn.close()
 
 while True:
+    #When receiving a new connection
     conn, addr = s.accept()
     players_id += 1
     game_id = (players_id - 1)//2
 
+    #If player has an odd id, then we create a new game, and wait for another one to be his pair (even id)
     if players_id % 2 == 1:
         games[game_id] = GameServer(players_id, None, game_id)
         print(f"Creating a new game. (Game id: {game_id} | Player 1: {players_id})")

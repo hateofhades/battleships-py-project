@@ -25,7 +25,8 @@ class GameServer:
         
     #First checks if initial and last positions are valid (if not returns error code -1)
     #Then checks if all positions are unnocupied (if not returns error code -2)
-    #If all are unnocupied occupy them
+    #Returns 0 if game is not in place mode
+    #If all are unnocupied occupy them and return 1
     def place_boat(self, boat_type, boat_start_x, boat_start_y, boat_orientation, player_id):
         if self.is_playing() != 1:
             return 0
@@ -243,19 +244,3 @@ class GameServer:
             self.who_plays = 1
 
         return self.player_2_guessed[x][y]
-    
-    def reset_game(self):
-        self.started = 0
-        self.who_plays = 1
-        self.won = 0
-
-        self.player_1_table = np.zeros((10, 10))
-        self.player_2_table = np.zeros((10, 10))
-        self.player_1_guessed = np.zeros((10, 10))
-        self.player_2_guessed = np.zeros((10, 10))       
-
-        self.player_1_boats = 0
-        self.player_2_boats = 0
-
-        self.player_1_ended_placing = 0
-        self.player_1_ended_placing = 0
