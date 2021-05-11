@@ -83,22 +83,23 @@ class Game:
                 self.window.fill(BLACK)
                 clicked = True
 
-                pygame.draw.line(self.window, (0, 250, 154), (600,0), (600,600), 3)
+                pygame.draw.line(self.window, (0, 250, 154), (605,0), (605,600), 3)
                 
-                #Useful messages during the game
-                player_text_1 = smallfont_id.render("You" , True , WHITE)
-                self.window.blit(player_text_1,(250,540))
-                player_text_2 = smallfont_id.render("Enemy" , True , WHITE)
-                self.window.blit(player_text_2,(887,540))
+                #Useful messages during the game                
+                player_text1 = smallfont_ID.render("You" , True , WHITE)
+                self.window.blit(player_text1,(230,530))
+                player_text2 = smallfont_ID.render("Enemy" , True , WHITE)
+                self.window.blit(player_text2,(890,530))
 
                 #draw the board
                 height = 47
                 margin = 5
 
+                #all blocks are blue at first, no boat is placed
                 for row in range(10):
                         for column in range(10):
                             pygame.draw.rect(self.window, BLUE, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])
-                            pygame.draw.rect(self.window, BLUE, [660 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
+                            pygame.draw.rect(self.window, BLUE, [675 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
 
 
                 if int(self.n.id) % 2 == 1: 
@@ -118,7 +119,7 @@ class Game:
                                 color = BLACK
                             if game.player_1_guessed[row][column] == 2:
                                 color = RED
-                            pygame.draw.rect(self.window, color, [660 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
+                            pygame.draw.rect(self.window, color, [675 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
 
                 else:
                     for row in range(10):
@@ -128,7 +129,7 @@ class Game:
                                 color = BLACK
                             if game.player_2_guessed[row][column] == 2:
                                 color = RED
-                            pygame.draw.rect(self.window, color, [660 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
+                            pygame.draw.rect(self.window, color, [675 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
                         
                     for row in range(10):
                         for column in range(10):
@@ -138,7 +139,7 @@ class Game:
                                 pygame.draw.rect(self.window, BLACK, [(margin + height) * column + margin, (margin + height) * row + margin, height, height]) 
                             if game.player_1_guessed[row][column] == 2:
                                 pygame.draw.rect(self.window, RED, [(margin + height) * column + margin, (margin + height) * row + margin, height, height]) 
-                
+
 
                 #init the boats
                 player_1_or_2 = int(self.n.id) % 2
@@ -162,12 +163,14 @@ class Game:
 
                     if dimension > 0:
                         txt = "Place a {} blocks boat with orientation {}".format(dimension, orient)
+
                         placing = smallfont_id.render(txt , True , WHITE)
-                        self.window.blit(placing,(120,570))
+                        self.window.blit(placing,(15,570))
                         
                         for event in pygame.event.get():
                             if event.type == pygame.MOUSEBUTTONDOWN:
-                                mouse_position = pygame.mouse.get_pos()
+                                #check the mouse position if clicked
+                                mouse_pos = pygame.mouse.get_pos()
                                 
                                 a = mouse_position[0] // (height + margin)
                                 b = mouse_position[1] // (height + margin)
@@ -183,21 +186,24 @@ class Game:
                                     game = self.n.send("get")
                                     
                                     #draw a black  rectangle on the previous text to make the next one visible :)
-                                    pygame.draw.rect(self.window, BLACK, [110, 540, 700, 600])
+                                    pygame.draw.rect(self.window, BLACK, [10, 530, 700, 600])
                             if event.type == pygame.KEYDOWN:
+                                #check if 'r' key is pressed
                                 if event.key == 114:
+                                    #rotate the boat
                                     self.orientation_number +=1
                                     if self. orientation_number == 4:
                                         self.orientation_number = 0 
                     else:
+                        #Guessing
                         if game.is_playing() == 2:
-                            pygame.draw.rect(self.window, BLACK, [110, 540, 700, 600])
+                            pygame.draw.rect(self.window, BLACK, [10, 530, 700, 600])
                         else:
-                            placing = smallfont_id.render("Wait for opponent to place their boats" , True , WHITE)
-                            self.window.blit(placing,(120,560))
+                            placing = smallfont_id.render("Waiting for opponent to place their boats..." , True , WHITE)
+                            self.window.blit(placing,(15,560))
                     
-                    pygame.display.update()  
-
+                    pygame.display.update() 
+                    
                 #Player can guess the position of the opponent's ships
                 if self.started == 2:
                     if self.last != game.who_plays:
@@ -210,17 +216,15 @@ class Game:
                             self.starting = 1
 
                         placing = smallfont_id.render("Time to guess!" , True , WHITE)
-                        self.window.blit(placing,(120,560))
-
+                        self.window.blit(placing,(180,560))
+    
                         for event in pygame.event.get():
                             if event.type == pygame.MOUSEBUTTONDOWN:
-                                mouse_position = pygame.mouse.get_pos()
-                                # print(mouse_position)
+                                mouse_pos = pygame.mouse.get_pos()
                                 
-                                a = (mouse_position[0] - 660) // (height + margin)
-                                b = mouse_position[1] // (height + margin)
-                                # print(a,b)
-
+                                a = (mouse_pos[0] - 675) // (height + margin)
+                                b = mouse_pos[1] // (height + margin)
+                    
                                 if a >= 0 and b >= 0:
                                     pygame.mixer.stop()
                                     self.n.send(f"hit {b} {a}")
@@ -231,8 +235,9 @@ class Game:
                                 game = self.n.send("get")
                         
                     else:
-                        placing = smallfont_id.render("Waiting for opponent!" , True , WHITE)
-                        self.window.blit(placing,(120,560))
+                        placing = smallfont_ID.render("Waiting for opponent to attack!" , True , WHITE)
+                        self.window.blit(placing,(65,560))
+
                         #Send guess to server
 
                 pygame.display.update()  
@@ -256,8 +261,12 @@ class Game:
 
                 #Draw the box that show the winner
                 smallfont_winner_box = pygame.font.SysFont('Corbel',60)
-                player_text_1 = smallfont_winner_box.render(f"The winner is: {game.won}" , True , WHITE)
-                self.window.blit(player_text_1,(445,550))
+
+                if game.won == player1Or2:
+                    player_text1 = smallfont_winner_box.render(f"You won!", True, WHITE)
+                else:
+                    player_text1 = smallfont_winner_box.render(f"You lost!", True, WHITE)
+                self.window.blit(player_text1,(500,550))
             
             for event in pygame.event.get():
             # check if the player has closed the game   
@@ -317,7 +326,6 @@ class Game:
                             self.window.blit(text_surface, (rectangle_box.x + 5, rectangle_box.y + 5))
                             rectangle_box.w = max(150, text_surface.get_width() + 10)
 
-                              
                     if clicked == False:
                         #draw the texts from the buttons
                         self.window.blit(text ,(418,365))
