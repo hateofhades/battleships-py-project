@@ -76,9 +76,11 @@ class Game:
 
         while running:
             game = GameServer(None, None, None)
+            #Request from the server the new gamestate every frame
             game = self.n.send("get")
             self.started = game.is_playing()
 
+            #If the game is in place or guess mode
             if self.started == 1 or self.started == 2:
                 self.window.fill(BLACK)
                 clicked = True
@@ -146,7 +148,9 @@ class Game:
                 if player_1_or_2 == 0:
                     player_1_or_2 = 2
                 
+                #If game is in hit mode
                 if game.is_playing() == 1:
+                    #If this is the first frame in hit mode play the "your turn" sound
                     if self.starting == 0:
                         self.starting = 1
                         yourturn.set_volume(0.3)
