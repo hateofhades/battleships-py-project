@@ -1,20 +1,21 @@
 import pygame
 from networkClass import Network
-from gameLogic import gameServer
+from gameLogic import GameServer
 import sys
 import os                    
 import random
 
-currentFolder = os.path.dirname(os.path.abspath(__file__))
+current_folder = os.path.dirname(os.path.abspath(__file__))
 
 pygame.init()
 pygame.mixer.init()
 
-hit = pygame.mixer.Sound(os.path.join(currentFolder, 'hit.wav'))
-miss = pygame.mixer.Sound(os.path.join(currentFolder, 'miss.wav'))
-yourturn = pygame.mixer.Sound(os.path.join(currentFolder, 'yourTurn.wav'))
-win = pygame.mixer.Sound(os.path.join(currentFolder, 'win.wav'))
-lose = pygame.mixer.Sound(os.path.join(currentFolder, 'lose.wav'))
+#Songs during the game
+hit = pygame.mixer.Sound(os.path.join(current_folder, 'hit.wav'))
+miss = pygame.mixer.Sound(os.path.join(current_folder, 'miss.wav'))
+yourturn = pygame.mixer.Sound(os.path.join(current_folder, 'yourTurn.wav'))
+win = pygame.mixer.Sound(os.path.join(current_folder, 'win.wav'))
+lose = pygame.mixer.Sound(os.path.join(current_folder, 'lose.wav'))
 
 
 frame_rate = pygame.time.Clock()
@@ -41,8 +42,8 @@ text = smallfont.render('PLAY' , True , WHITE)
 base_font = pygame.font.Font(None, 32)
 rectangle_box_active_color = (114,121,121)
 rectangle_box_passive_color = WHITE
-smallfont_ID = pygame.font.SysFont('Corbel',32)
-id_text = smallfont_ID.render('Player ID: ' , True , WHITE)
+smallfont_id = pygame.font.SysFont('Corbel',32)
+id_text = smallfont_id.render('Player ID: ' , True , WHITE)
 
 
 #class of in-game items
@@ -53,13 +54,14 @@ class Game:
         self.n = Network()
         print(self.n.id)
         self.started = 0
-        self.boatType = 0
-        self.totalPutBoat = 0
+        self.boat_type = 0
+        self.total_put_boat = 0
         self.orientation_number = 0
         self.starting = 0
         self.last = 0
         self.winLoseSound = 0
 
+    #Initialize player ID
     def draw(self):
         self.user_id = self.n.id
         running = True
@@ -73,9 +75,9 @@ class Game:
         active = False
 
         while running:
-            game = gameServer(None, None, None)
+            game = GameServer(None, None, None)
             game = self.n.send("get")
-            self.started = game.isPlaying()
+            self.started = game.is_playing()
 
             if self.started == 1 or self.started == 2:
                 self.window.fill(BLACK)
@@ -83,6 +85,7 @@ class Game:
 
                 pygame.draw.line(self.window, (0, 250, 154), (605,0), (605,600), 3)
                 
+                #Useful messages during the game                
                 player_text1 = smallfont_ID.render("You" , True , WHITE)
                 self.window.blit(player_text1,(230,530))
                 player_text2 = smallfont_ID.render("Enemy" , True , WHITE)
@@ -98,22 +101,23 @@ class Game:
                             pygame.draw.rect(self.window, BLUE, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])
                             pygame.draw.rect(self.window, BLUE, [675 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
 
+
                 if int(self.n.id) % 2 == 1: 
                     for row in range(10):
                         for column in range(10):
-                            if game.player1Table[row][column] == 1:
+                            if game.player_1_table[row][column] == 1:
                                 pygame.draw.rect(self.window, BOATCOLOR, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])  
-                            if game.player2Guessed[row][column] == 1:
+                            if game.player_2_guessed[row][column] == 1:
                                 pygame.draw.rect(self.window, BLACK, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])
-                            if game.player2Guessed[row][column] == 2:
+                            if game.player_2_guessed[row][column] == 2:
                                 pygame.draw.rect(self.window, RED, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])
-                        
+  
                     for row in range(10):
                         for column in range(10):
                             color = BLUE
-                            if game.player1Guessed[row][column] == 1:
+                            if game.player_1_guessed[row][column] == 1:
                                 color = BLACK
-                            if game.player1Guessed[row][column] == 2:
+                            if game.player_1_guessed[row][column] == 2:
                                 color = RED
                             pygame.draw.rect(self.window, color, [675 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
 
@@ -121,27 +125,28 @@ class Game:
                     for row in range(10):
                         for column in range(10):
                             color = BLUE
-                            if game.player2Guessed[row][column] == 1:
+                            if game.player_2_guessed[row][column] == 1:
                                 color = BLACK
-                            if game.player2Guessed[row][column] == 2:
+                            if game.player_2_guessed[row][column] == 2:
                                 color = RED
                             pygame.draw.rect(self.window, color, [675 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
                         
                     for row in range(10):
                         for column in range(10):
-                            if game.player2Table[row][column] == 1:
+                            if game.player_2_table[row][column] == 1:
                                 pygame.draw.rect(self.window, BOATCOLOR, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])  
-                            if game.player1Guessed[row][column] == 1:
+                            if game.player_1_guessed[row][column] == 1:
                                 pygame.draw.rect(self.window, BLACK, [(margin + height) * column + margin, (margin + height) * row + margin, height, height]) 
-                            if game.player1Guessed[row][column] == 2:
-                                pygame.draw.rect(self.window, RED, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])
+                            if game.player_1_guessed[row][column] == 2:
+                                pygame.draw.rect(self.window, RED, [(margin + height) * column + margin, (margin + height) * row + margin, height, height]) 
+
 
                 #init the boats
-                player1Or2 = int(self.n.id) % 2
-                if player1Or2 == 0:
-                    player1Or2 = 2
+                player_1_or_2 = int(self.n.id) % 2
+                if player_1_or_2 == 0:
+                    player_1_or_2 = 2
                 
-                if game.isPlaying() == 1:
+                if game.is_playing() == 1:
                     if self.starting == 0:
                         self.starting = 1
                         yourturn.play()
@@ -151,14 +156,15 @@ class Game:
                     
                     orient = cardinals[self.orientation_number]
 
-                    if self.boatType < 4:
-                        dimension = v[self.boatType]
+                    if self.boat_type < 4:
+                        dimension = v[self.boat_type]
                     else:
                         dimension = 0
 
                     if dimension > 0:
                         txt = "Place a {} blocks boat with orientation {}".format(dimension, orient)
-                        placing = smallfont_ID.render(txt , True , WHITE)
+
+                        placing = smallfont_id.render(txt , True , WHITE)
                         self.window.blit(placing,(15,570))
                         
                         for event in pygame.event.get():
@@ -166,17 +172,19 @@ class Game:
                                 #check the mouse position if clicked
                                 mouse_pos = pygame.mouse.get_pos()
                                 
-                                a = mouse_pos[0] // (height + margin)
-                                b = mouse_pos[1] // (height + margin)
+                                a = mouse_position[0] // (height + margin)
+                                b = mouse_position[1] // (height + margin)
 
-                                if game.placeBoat(dimension, a, b, orient, player1Or2) == 1:
-                                    self.totalPutBoat += 1
-                                    if self.totalPutBoat == 4 - self.boatType:
-                                        self.totalPutBoat = 0
-                                        self.boatType += 1
+                                if game.place_boat(dimension, a, b, orient, player_1_or_2) == 1:
+                                    self.total_put_boat += 1
+                                    if self.total_put_boat == 4 - self.boat_type:
+                                        self.total_put_boat = 0
+                                        self.boat_type += 1
+
                                     #send the info to the server
                                     self.n.send(f"place {dimension} {a} {b} {orient}")
                                     game = self.n.send("get")
+                                    
                                     #draw a black  rectangle on the previous text to make the next one visible :)
                                     pygame.draw.rect(self.window, BLACK, [10, 530, 700, 600])
                             if event.type == pygame.KEYDOWN:
@@ -187,37 +195,40 @@ class Game:
                                     if self. orientation_number == 4:
                                         self.orientation_number = 0 
                     else:
-                        if game.isPlaying() == 2:
+                        #Guessing
+                        if game.is_playing() == 2:
                             pygame.draw.rect(self.window, BLACK, [10, 530, 700, 600])
                         else:
-                            placing = smallfont_ID.render("Waiting for opponent to place their boats..." , True , WHITE)
+                            placing = smallfont_id.render("Waiting for opponent to place their boats..." , True , WHITE)
                             self.window.blit(placing,(15,560))
                     
-                    pygame.display.update()  
-
-                #Guessing
+                    pygame.display.update() 
+                    
+                #Player can guess the position of the opponent's ships
                 if self.started == 2:
-                    if self.last != game.whoPlays:
+                    if self.last != game.who_plays:
                         self.starting = 0
-                        self.last = game.whoPlays
+                        self.last = game.who_plays
 
-                    if game.whoPlays == player1Or2:
+                    if game.who_plays == player_1_or_2:
                         if self.starting == 0:
                             yourturn.play()
                             self.starting = 1
 
-                        placing = smallfont_ID.render("Time to guess!" , True , WHITE)
+                        placing = smallfont_id.render("Time to guess!" , True , WHITE)
                         self.window.blit(placing,(180,560))
+    
                         for event in pygame.event.get():
                             if event.type == pygame.MOUSEBUTTONDOWN:
                                 mouse_pos = pygame.mouse.get_pos()
                                 
                                 a = (mouse_pos[0] - 675) // (height + margin)
                                 b = mouse_pos[1] // (height + margin)
+                    
                                 if a >= 0 and b >= 0:
                                     pygame.mixer.stop()
                                     self.n.send(f"hit {b} {a}")
-                                    if (player1Or2 == 1 and game.guessPlayer1(b, a) == 1) or (player1Or2 == 2 and game.guessPlayer2(b, a) == 1):
+                                    if (player_1_or_2 == 1 and game.guess_player_1(b, a) == 1) or (player_1_or_2 == 2 and game.guess_player_2(b, a) == 1):
                                         miss.play()
                                     else:
                                         hit.play()
@@ -226,14 +237,16 @@ class Game:
                     else:
                         placing = smallfont_ID.render("Waiting for opponent to attack!" , True , WHITE)
                         self.window.blit(placing,(65,560))
+
                         #Send guess to server
+
                 pygame.display.update()  
 
             #Game is finished
             elif self.started == 3:
                 if self.winLoseSound == 0:
                     pygame.mixer.stop()
-                    if game.won == player1Or2:
+                    if game.won == player_1_or_2:
                         win.play()
                     else:
                         lose.play()
@@ -241,13 +254,14 @@ class Game:
                     self.winLoseSound = 1
 
                 #Draw the final background image
-                backgroundImage = os.path.join(currentFolder, 'final_background.jpeg')
+                backgroundImage = os.path.join(current_folder, 'final_background.jpeg')
                 back_ground = pygame.image.load(backgroundImage)
                 bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
                 self.window.blit(bg, (0,0))
 
-                #Draw the bow that show the winner
+                #Draw the box that show the winner
                 smallfont_winner_box = pygame.font.SysFont('Corbel',60)
+
                 if game.won == player1Or2:
                     player_text1 = smallfont_winner_box.render(f"You won!", True, WHITE)
                 else:
@@ -276,7 +290,9 @@ class Game:
                                     self.user_id += event.unicode
 
                         #background of the home page
-                        backgroundImage = os.path.join(currentFolder, 'homepage_background.jpg')
+                        #Same of the code for backgrounds was done thanks to 
+                        #https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame
+                        backgroundImage = os.path.join(current_folder, 'homepage_background.jpg')
                         back_ground = pygame.image.load(backgroundImage)
                         bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
                         self.window.blit(bg, (0,0))

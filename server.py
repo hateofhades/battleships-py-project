@@ -1,6 +1,7 @@
-#Most of the networking was done thanks to https://www.techwithtim.net/tutorials/python-online-game-tutorial/server/
+#Most of the networking was done thanks to 
+# https://www.techwithtim.net/tutorials/python-online-game-tutorial/server/
 import socket
-from gameLogic import gameServer
+from gameLogic import GameServer
 from _thread import *
 import sys
 import pickle
@@ -14,7 +15,7 @@ server = "localhost"
 port = 14201
 
 #Other info
-playersId = 0
+players_id = 0
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -27,18 +28,19 @@ except socket.error as e:
 s.listen(2)
 print("Waiting for a new connection.")
 
-#Function thanks to https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
-def send_msg(sock, msg):
+#Function thanks to 
+# https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
+def send_message(sock, message):
     # Prefix each message with a 4-byte length (network byte order)
-    msg = struct.pack('>I', len(msg)) + msg
-    sock.sendall(msg)
+    message = struct.pack('>I', len(message)) + message
+    sock.sendall(message)
 
-def threaded_client(conn, playerId, gameId):
-    send_msg(conn, str.encode(str(playerId)))
+def threaded_client(conn, player_id, game_id):
+    send_message(conn, str.encode(str(player_id)))
     reply = ""
     ok = 0
 
-    currentGame = games[gameId]
+    current_game = games[game_id]
 
     while True:
         try:
@@ -50,56 +52,56 @@ def threaded_client(conn, playerId, gameId):
             else:
                 data = data.split(" ")
                 if data[0] == "hit":
-                    send_msg(conn, pickle.dumps(currentGame))
-                    if playerId % 2 == 1:
-                        currentGame.guessPlayer1(int(data[1]), int(data[2]))
+                    send_message(conn, pickle.dumps(current_game))
+                    if player_id % 2 == 1:
+                        current_game.guess_player_1(int(data[1]), int(data[2]))
                     else:
-                        currentGame.guessPlayer2(int(data[1]), int(data[2]))
+                        current_game.guess_player_2(int(data[1]), int(data[2]))
                         
                 elif data[0] == "get":
-                    send_msg(conn, pickle.dumps(currentGame))
+                    send_message(conn, pickle.dumps(current_game))
                 elif data[0] == "start":
-                    send_msg(conn, pickle.dumps(currentGame))
-                    currentGame.start()
+                    send_message(conn, pickle.dumps(current_game))
+                    current_game.start()
                 elif data[0] == "place":
-                    send_msg(conn, pickle.dumps(currentGame))
-                    boatType = int(data[1])
-                    boatStartX = int(data[2])
-                    boatStartY = int(data[3])
-                    boatOrientation = data[4]
+                    send_message(conn, pickle.dumps(current_game))
+                    boat_type = int(data[1])
+                    boat_start_x = int(data[2])
+                    boat_start_y = int(data[3])
+                    boat_orientation = data[4]
                     
-                    player1Or2 = int(playerId) % 2
-                    if player1Or2 == 0:
-                        player1Or2 = 2
+                    player_1_or_2 = int(player_id) % 2
+                    if player_1_or_2 == 0:
+                        player_1_or_2 = 2
 
-                    currentGame.placeBoat(boatType, boatStartX, boatStartY, boatOrientation, player1Or2)
+                    current_game.place_boat(boat_type, boat_start_x, boat_start_y, boat_orientation, player_1_or_2)
                 elif data[0] == "reset":
-                    send_msg(conn, pickle.dumps(currentGame))
-                    currentGame.resetGame()
+                    send_message(conn, pickle.dumps(current_game))
+                    current_game.reset_game()
 
         except:
             break
 
     print("Lost connection")
     try:
-        del games[gameId]
-        print(f"Closed game {gameId}")
+        del games[game_id]
+        print(f"Closed game {game_id}")
     except:
         pass
     conn.close()
 
 while True:
     conn, addr = s.accept()
-    playersId += 1
-    gameId = (playersId - 1)//2
+    players_id += 1
+    game_id = (players_id - 1)//2
 
-    if playersId % 2 == 1:
-        games[gameId] = gameServer(playersId, None, gameId)
-        print(f"Creating a new game. (Game id: {gameId} | Player 1: {playersId})")
+    if players_id % 2 == 1:
+        games[game_id] = GameServer(players_id, None, game_id)
+        print(f"Creating a new game. (Game id: {game_id} | Player 1: {players_id})")
     else:
-        games[gameId].addPlayer2(playersId)
-        print(f"Adding player {playersId} to game {gameId}")
-        games[gameId].start()
+        games[game_id].add_player_2(players_id)
+        print(f"Adding player {players_id} to game {game_id}")
+        games[game_id].start()
 
     #Start a new thread that will be used to communicate with the player
-    start_new_thread(threaded_client, (conn, playersId, gameId))
+    start_new_thread(threaded_client, (conn, players_id, game_id))
