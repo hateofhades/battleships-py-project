@@ -86,9 +86,9 @@ class Game:
                 pygame.draw.line(self.window, (0, 250, 154), (605,0), (605,600), 3)
                 
                 #Useful messages during the game                
-                player_text1 = smallfont_ID.render("You" , True , WHITE)
+                player_text1 = smallfont_id.render("You" , True , WHITE)
                 self.window.blit(player_text1,(230,530))
-                player_text2 = smallfont_ID.render("Enemy" , True , WHITE)
+                player_text2 = smallfont_id.render("Enemy" , True , WHITE)
                 self.window.blit(player_text2,(890,530))
 
                 #draw the board
@@ -172,8 +172,8 @@ class Game:
                                 #check the mouse position if clicked
                                 mouse_pos = pygame.mouse.get_pos()
                                 
-                                a = mouse_position[0] // (height + margin)
-                                b = mouse_position[1] // (height + margin)
+                                a = mouse_pos[0] // (height + margin)
+                                b = mouse_pos[1] // (height + margin)
 
                                 if game.place_boat(dimension, a, b, orient, player_1_or_2) == 1:
                                     self.total_put_boat += 1
@@ -235,7 +235,7 @@ class Game:
                                 game = self.n.send("get")
                         
                     else:
-                        placing = smallfont_ID.render("Waiting for opponent to attack!" , True , WHITE)
+                        placing = smallfont_id.render("Waiting for opponent to attack!" , True , WHITE)
                         self.window.blit(placing,(65,560))
 
                         #Send guess to server
@@ -262,11 +262,11 @@ class Game:
                 #Draw the box that show the winner
                 smallfont_winner_box = pygame.font.SysFont('Corbel',60)
 
-                if game.won == player1Or2:
+                if game.won == player_1_or_2:
                     player_text1 = smallfont_winner_box.render(f"You won!", True, WHITE)
                 else:
                     player_text1 = smallfont_winner_box.render(f"You lost!", True, WHITE)
-                self.window.blit(player_text1,(500,550))
+                self.window.blit(player_text1,(510,550))
             
             for event in pygame.event.get():
             # check if the player has closed the game   
