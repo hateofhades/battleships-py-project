@@ -9,11 +9,11 @@ pygame.init()
 pygame.mixer.init()
 
 #Songs during the game
-hit = pygame.mixer.Sound(os.path.join(current_folder, 'hit.wav'))
-miss = pygame.mixer.Sound(os.path.join(current_folder, 'miss.wav'))
-yourturn = pygame.mixer.Sound(os.path.join(current_folder, 'yourTurn.wav'))
-win = pygame.mixer.Sound(os.path.join(current_folder, 'win.wav'))
-lose = pygame.mixer.Sound(os.path.join(current_folder, 'lose.wav'))
+hit = pygame.mixer.Sound(os.path.join(current_folder, 'sounds/hit.wav'))
+miss = pygame.mixer.Sound(os.path.join(current_folder, 'sounds/miss.wav'))
+yourturn = pygame.mixer.Sound(os.path.join(current_folder, 'sounds/yourTurn.wav'))
+win = pygame.mixer.Sound(os.path.join(current_folder, 'sounds/win.wav'))
+lose = pygame.mixer.Sound(os.path.join(current_folder, 'sounds/lose.wav'))
 
 
 frame_rate = pygame.time.Clock()
@@ -262,7 +262,7 @@ class Game:
                     self.winLoseSound = 1
 
                 #Draw the final background image
-                backgroundImage = os.path.join(current_folder, 'final_background.jpeg')
+                backgroundImage = os.path.join(current_folder, 'img/final_background.jpeg')
                 back_ground = pygame.image.load(backgroundImage)
                 bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
                 self.window.blit(bg, (0,0))
@@ -300,7 +300,7 @@ class Game:
                         #background of the home page
                         #Same of the code for backgrounds was done thanks to 
                         #https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame
-                        backgroundImage = os.path.join(current_folder, 'homepage_background.jpg')
+                        backgroundImage = os.path.join(current_folder, 'img/homepage_background.jpg')
                         back_ground = pygame.image.load(backgroundImage)
                         bg = pygame.transform.scale(back_ground, (WIDTH, HEIGHT))
                         self.window.blit(bg, (0,0))
