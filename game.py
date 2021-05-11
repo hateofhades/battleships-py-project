@@ -94,13 +94,13 @@ class Game:
                 #draw the board
                 height = 47
                 margin = 5
+                #the idea of mapping the blocks after the matrix was inspired from http://programarcadegames.com/index.php?lang=en&chapter=array_backed_grids
 
                 #all blocks are blue at first, no boat is placed
                 for row in range(10):
                         for column in range(10):
                             pygame.draw.rect(self.window, BLUE, [(margin + height) * column + margin, (margin + height) * row + margin, height, height])
                             pygame.draw.rect(self.window, BLUE, [675 + (margin + height) * column + margin, (margin + height) * row + margin, height, height])
-
 
                 if int(self.n.id) % 2 == 1: 
                     for row in range(10):
